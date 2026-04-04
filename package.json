@@ -1,0 +1,13 @@
+{
+  "name": "marketplace-fee-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unified static fee calculators for Amazon NA, Amazon EU & UK, and Walmart WFS.",
+  "scripts": {
+    "build": "node scripts/build-deploy-site.js",
+    "test": "node --test ./tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amazon NA FBA Fee Calculator</title>
+  <style>
+    :root {
+      --bg: #edf3f8;
+      --panel: rgba(251, 254, 255, 0.88);
+      --panel-strong: #ffffff;
+      --line: rgba(25, 49, 74, 0.12);
+      --ink: #102134;
+      --muted: #5a6b7d;
+      --accent: #0f6cbd;
+      --accent-2: #1d8b72;
+      --accent-soft: rgba(15, 108, 189, 0.1);
+      --warn: #a76411;
+      --shadow: 0 26px 60px rgba(14, 42, 69, 0.14);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 28%),
+        radial-gradient(circle at 88% 16%, rgba(120, 181, 255, 0.2), rgba(120, 181, 255, 0) 26%),
+        linear-gradient(145deg, #eef4f8 0%, #f6fafe 50%, #ecf3f8 100%);
+      padding: 28px;
+    }
+
+    .app {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel,
+    .card,
+    .summary-card {
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      overflow: hidden;
+    }
+
+    .hero-copy {
+      padding: 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 62ch;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .hero-side {
+      padding: 28px;
+      border-left: 1px solid rgba(25, 49, 74, 0.08);
+      background:
+        linear-gradient(180deg, rgba(247, 251, 255, 0.82), rgba(234, 245, 255, 0.92)),
+        linear-gradient(135deg, #edf5fb, #e7f3ff);
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+    }
+
+    .mini-card span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 25px;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .hero-list li {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 430px) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.03em;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .form-grid {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .triple,
+    .double {
+      display: grid;
+      gap: 12px;
+    }
+
+    .triple {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .double {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 14px 15px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(15, 108, 189, 0.46);
+      box-shadow: 0 0 0 4px rgba(15, 108, 189, 0.12);
+    }
+
+    .toggle-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .toggle {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+    }
+
+    .toggle input {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      accent-color: var(--accent);
+    }
+
+    .toggle strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .toggle span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #1273c3, #0b5ca2);
+      color: #fff;
+      box-shadow: 0 18px 30px rgba(15, 108, 189, 0.22);
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+      color: var(--ink);
+    }
+
+    .tiny {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    #result-root {
+      display: grid;
+      gap: 18px;
+    }
+
+    .empty-state {
+      padding: 28px;
+      border-radius: 22px;
+      border: 1px dashed rgba(15, 108, 189, 0.24);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(242, 248, 255, 0.72));
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      padding: 20px;
+    }
+
+    .total-card {
+      background:
+        linear-gradient(140deg, rgba(15, 108, 189, 0.94), rgba(28, 139, 114, 0.9)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+      color: #fff;
+      border: 0;
+    }
+
+    .total-card .eyebrow,
+    .total-card p {
+      color: rgba(255, 255, 255, 0.86);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .hero-value,
+    .metric-value {
+      margin-top: 10px;
+      font-size: clamp(28px, 3vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .summary-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      padding: 20px;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .guide-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+      display: grid;
+      gap: 14px;
+    }
+
+    .guide-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .guide-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .guide-item {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(248, 251, 255, 0.9);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+    }
+
+    .guide-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .guide-item span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .fact {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+    }
+
+    .fact span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .fact strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 16px;
+    }
+
+    .line-list,
+    .notes {
+      display: grid;
+      gap: 10px;
+    }
+
+    .line-item,
+    .note {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(25, 49, 74, 0.08);
+    }
+
+    .line-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .line-item span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .amount {
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .plus {
+      color: var(--accent-2);
+    }
+
+    .minus {
+      color: var(--accent);
+    }
+
+    .notes-card .note {
+      grid-template-columns: 1fr;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .note.warn {
+      background: rgba(167, 100, 17, 0.08);
+      border-color: rgba(167, 100, 17, 0.16);
+      color: var(--warn);
+    }
+
+    @media (max-width: 1080px) {
+      .hero,
+      .workspace,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-side {
+        border-left: 0;
+        border-top: 1px solid rgba(25, 49, 74, 0.08);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 16px;
+      }
+
+      .hero-copy,
+      .hero-side,
+      .panel,
+      .card,
+      .summary-card {
+        padding: 18px;
+      }
+
+      .triple,
+      .double,
+      .summary-grid,
+      .mini-grid,
+      .facts,
+      .guide-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+  <script defer src="./fba-surcharge-rules.js"></script>
+  <script defer src="./fba-us-local-fee-calculator.js"></script>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow" id="market-badge">NA FBA · Amazon.com</div>
+        <h1>亚马逊北美区 FBA 费用计算页</h1>
+        <p>
+          这是和欧洲版完全独立的新页面，现在统一支持美国、加拿大、墨西哥本地 FBA。
+          你输入站点、包装尺寸、重量、售价和费率类别后，页面会自动判断
+          <code>size tier</code>、<code>shipping weight</code>、基础履约费，
+          并在符合条件时计入各站点对应的 <code>SIPP</code> 折扣、
+          包装费、<code>low-inventory-level fee</code> 与
+          <code>overmax handling fee</code>。
+        </p>
+      </div>
+      <aside class="hero-side">
+        <div class="mini-grid">
+          <div class="mini-card">
+            <span>站点范围</span>
+            <strong id="market-range">US Local</strong>
+          </div>
+          <div class="mini-card">
+            <span>生效日期</span>
+            <strong>US / CA 2026+</strong>
+          </div>
+          <div class="mini-card">
+            <span>尺寸层级</span>
+            <strong>US / CA / MX</strong>
+          </div>
+          <div class="mini-card">
+            <span>货币</span>
+            <strong>USD / CAD / MXN</strong>
+          </div>
+        </div>
+        <ul class="hero-list">
+          <li>US 保留 `non-apparel`、`apparel`、`dangerous goods` 三套 2026 非旺季费率。</li>
+          <li>CA 支持 `Envelope / Standard / Oversize` 以及对应的 SIPP discount。</li>
+          <li>MX 支持 3 套费率组、含 VAT 售价带与 SIPP discount。</li>
+          <li>US 会继续计算 `low-inventory-level fee`、`Overmax` 与 bulky `packaging fee`。</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <section class="panel">
+        <h2>输入参数</h2>
+        <p>先选择站点，再输入尺寸、重量和售价。尺寸可用英寸或厘米，重量可用 lb / oz / kg，页面会自动换算成对应站点的计费单位。</p>
+
+        <form id="us-fee-form" class="form-grid">
+          <div class="double">
+            <div class="field">
+              <label for="market">站点</label>
+              <select id="market" name="market">
+                <option value="US">US / 美国站</option>
+                <option value="CA">CA / 加拿大站</option>
+                <option value="MX">MX / 墨西哥站</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="category" id="category-label">产品类型</label>
+              <select id="category" name="category">
+                <option value="non_apparel">Non-apparel / 普通货</option>
+                <option value="apparel">Apparel / 服饰</option>
+                <option value="dangerous_goods">Dangerous goods / 危险品</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="price" id="price-label">售价（USD）</label>
+            <input id="price" name="price" type="number" min="0.01" step="0.01" value="19.99" />
+            <div class="tiny" id="price-hint">美国站按售价带 `< $10` / `$10 - $50` / `> $50` 计费。</div>
+          </div>
+
+          <div class="double">
+            <div class="field">
+              <label for="dimensionUnit">尺寸单位</label>
+              <select id="dimensionUnit" name="dimensionUnit">
+                <option value="in">inch</option>
+                <option value="cm" selected>cm</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="weightUnit">重量单位</label>
+              <select id="weightUnit" name="weightUnit">
+                <option value="lb">lb</option>
+                <option value="oz">oz</option>
+                <option value="kg" selected>kg</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="triple">
+            <div class="field">
+              <label for="length">长</label>
+              <input id="length" name="length" type="number" min="0.01" step="0.01" value="13" required />
+            </div>
+            <div class="field">
+              <label for="width">宽</label>
+              <input id="width" name="width" type="number" min="0.01" step="0.01" value="9" required />
+            </div>
+            <div class="field">
+              <label for="height">高</label>
+              <input id="height" name="height" type="number" min="0.01" step="0.01" value="0.85" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="weight">包装重量</label>
+            <input id="weight" name="weight" type="number" min="0.01" step="0.01" value="5.4" required />
+          </div>
+
+          <div class="toggle-list">
+            <label class="toggle">
+              <input id="fuelLogisticsSurcharge" name="fuelLogisticsSurcharge" type="checkbox" checked />
+              <div>
+                <strong>Fuel & logistics surcharge</strong>
+                <span>默认按 2026-04-17 起的临时规则预估。US / CA 会对基础 fulfilment fee 加收 3.5%，MX 当前不适用。</span>
+              </div>
+            </label>
+
+            <label class="toggle">
+              <input id="sippCertified" name="sippCertified" type="checkbox" />
+              <div>
+                <strong>已参加 / 通过 SIPP</strong>
+                <span>US / CA / MX 都会按你提供的资料计算对应的 SIPP discount；US bulky 仍会在未参加 SIPP 时追加 packaging fee。</span>
+              </div>
+            </label>
+          </div>
+
+          <section class="guide-card">
+            <div class="guide-head">
+              <h3 id="size-tier-guide-title">当前站点 Size Tier</h3>
+              <p id="size-tier-guide-intro">切换站点后，这里会同步显示该站点的尺寸层级判断标准。</p>
+            </div>
+            <div class="guide-grid" id="size-tier-guide-grid"></div>
+          </section>
+
+          <div id="us-only-section">
+            <div class="double">
+              <div class="field">
+                <label for="longTermDos">Long-term historical days of supply（90 天）</label>
+                <input id="longTermDos" name="longTermDos" type="number" min="0" step="0.1" placeholder="仅 US 用于 low-inventory-level fee" />
+              </div>
+              <div class="field">
+                <label for="shortTermDos">Short-term historical days of supply（30 天）</label>
+                <input id="shortTermDos" name="shortTermDos" type="number" min="0" step="0.1" placeholder="仅 US 用于 low-inventory-level fee" />
+              </div>
+            </div>
+
+            <div class="toggle-list">
+              <label class="toggle">
+                <input id="groceryExempt" name="groceryExempt" type="checkbox" />
+                <div>
+                  <strong>Grocery category 豁免 low-inventory fee</strong>
+                  <span>根据 PDF，Grocery 类目不适用 low-inventory-level fee。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="newSellerExempt" name="newSellerExempt" type="checkbox" />
+                <div>
+                  <strong>新 Professional seller 前 365 天</strong>
+                  <span>如果满足新卖家豁免，则不收 low-inventory-level fee。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="newToFbaExempt" name="newToFbaExempt" type="checkbox" />
+                <div>
+                  <strong>New-to-FBA 前 180 天且符合 FBA New Selection</strong>
+                  <span>按 PDF FAQ 视为 low-inventory fee 豁免。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="awdExempt" name="awdExempt" type="checkbox" />
+                <div>
+                  <strong>过去 90 天有 70%+ 库存通过 AWD 自动补货</strong>
+                  <span>满足时低库存费豁免。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="slowMoverExempt" name="slowMoverExempt" type="checkbox" />
+                <div>
+                  <strong>过去 7 天销量少于 20 件</strong>
+                  <span>慢销 SKU 免 low-inventory-level fee。</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="primary">计算北美 FBA 费用</button>
+            <button type="button" id="sample-small" class="secondary">载入轻量示例</button>
+            <button type="button" id="sample-overmax" class="secondary">载入大件示例</button>
+          </div>
+
+          <div class="tiny">
+            本页只按你提供的北美站 PDF 实现当前规则；欧洲页仍保持独立，不与本页混用。
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>计算结果</h2>
+        <p id="result-intro">结果会显示基础履约费、fuel surcharge、SIPP 调整、low inventory 附加费和 overmax handling fee。</p>
+        <div id="result-root">
+          <div class="empty-state">
+            先选择站点，再输入尺寸、重量、售价和费率类别，然后点击“计算北美 FBA 费用”。
+          </div>
+        </div>
+      </section>
+    </section>
+  </div>
+</body>
+</html>

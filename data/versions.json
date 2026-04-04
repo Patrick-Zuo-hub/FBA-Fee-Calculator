@@ -1,0 +1,57 @@
+{
+  "na": {
+    "name": "Amazon NA",
+    "route": "/na/",
+    "updatedAt": "2026-04-03",
+    "status": "Fuel surcharge toggle available for US/CA",
+    "coverage": "US / CA / MX"
+  },
+  "eu-uk": {
+    "name": "Amazon EU & UK",
+    "route": "/eu-uk/",
+    "updatedAt": "2026-04-03",
+    "status": "Fuel surcharge toggle available for eligible destinations",
+    "coverage": "UK / FR / DE / IT / ES / PL / SE / NL / IE / BE"
+  },
+  "walmart": {
+    "name": "Walmart WFS",
+    "route": "/walmart/",
+    "updatedAt": "2026-03-25",
+    "status": "Fulfilment and storage logic active",
+    "coverage": "Walmart US"
+  },
+  "homepageUpdates": [
+    {
+      "date": "2026-04-03",
+      "module": "na",
+      "title": "Fuel surcharge support for NA",
+      "summary": "Amazon NA calculators now reflect the April 3, 2026 fuel surcharge update."
+    },
+    {
+      "date": "2026-04-03",
+      "module": "eu-uk",
+      "title": "Fuel surcharge support for EU & UK",
+      "summary": "Amazon EU & UK calculators now reflect the April 3, 2026 fuel surcharge update."
+    }
+  ],
+  "updates": [
+    {
+      "date": "2026-04-03",
+      "module": "na",
+      "title": "Fuel surcharge support for NA",
+      "summary": "Amazon NA calculators now reflect the April 3, 2026 fuel surcharge update."
+    },
+    {
+      "date": "2026-04-03",
+      "module": "eu-uk",
+      "title": "Fuel surcharge support for EU & UK",
+      "summary": "Amazon EU & UK calculators now reflect the April 3, 2026 fuel surcharge update."
+    },
+    {
+      "date": "2026-03-25",
+      "module": "walmart",
+      "title": "Original Walmart release",
+      "summary": "The Walmart WFS workspace launched with the first production fee model."
+    }
+  ]
+}

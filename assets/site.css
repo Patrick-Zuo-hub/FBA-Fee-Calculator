@@ -1,0 +1,163 @@
+:root {
+  --bg: #f5f5f7;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: #ffffff;
+  --line: rgba(29, 29, 31, 0.08);
+  --ink: #111111;
+  --muted: #6e6e73;
+  --accent: #0071e3;
+  --shadow: 0 24px 80px rgba(17, 17, 17, 0.08);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --content-width: 1280px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  line-height: 1.5;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.95), rgba(255,255,255,0) 30%),
+    linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
+}
+.site-shell { max-width: var(--content-width); margin: 0 auto; padding: 28px 24px 40px; }
+.site-nav,
+.hero-card,
+.tool-card,
+.info-card,
+.page-panel {
+  background: var(--panel);
+  backdrop-filter: saturate(180%) blur(24px);
+  border: 1px solid rgba(255,255,255,0.72);
+  box-shadow: var(--shadow);
+}
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  position: sticky;
+  top: 14px;
+  z-index: 10;
+}
+.site-notice {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(191, 138, 0, 0.18);
+  background: rgba(255, 214, 102, 0.16);
+  color: #6f4d00;
+  box-shadow: 0 16px 48px rgba(17, 17, 17, 0.06);
+  font-size: 14px;
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 18px;
+}
+.nav-links a,
+.brand,
+.tool-link {
+  color: inherit;
+  text-decoration: none;
+}
+.nav-links a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  background: rgba(17, 17, 17, 0.06);
+  color: var(--ink);
+}
+.hero-card,
+.page-panel {
+  border-radius: var(--radius-xl);
+  padding: 30px;
+  overflow: hidden;
+}
+.tool-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.tool-card,
+.info-card {
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.tool-card:hover,
+.tool-card:focus-within,
+.info-card:hover,
+.info-card:focus-within {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.92);
+  box-shadow: 0 28px 88px rgba(17, 17, 17, 0.11);
+}
+.eyebrow {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(0, 113, 227, 0.08);
+}
+.muted { color: var(--muted); }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.primary-btn { background: var(--accent); color: #fff; }
+.secondary-btn { background: rgba(255,255,255,0.8); color: var(--ink); border: 1px solid var(--line); }
+.meta-list,
+.update-list { display: grid; gap: 12px; }
+.page-header { display: grid; gap: 18px; margin-top: 24px; }
+.page-header[id] { scroll-margin-top: 108px; }
+.tool-embed {
+  display: block;
+  margin-top: 22px;
+  border: 1px solid var(--line);
+  width: 100%;
+  min-height: clamp(1320px, 155vh, 1800px);
+  height: clamp(1320px, 155vh, 1800px);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.88));
+}
+@media (max-width: 960px) {
+  .tool-grid { grid-template-columns: 1fr; }
+  .site-nav {
+    border-radius: 28px;
+    align-items: flex-start;
+  }
+  .nav-links {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 720px) {
+  .site-shell { padding: 16px; }
+  .tool-embed { min-height: 1320px; height: 1320px; }
+  .nav-links { gap: 12px; flex-wrap: wrap; }
+  .site-nav,
+  .hero-card,
+  .page-panel,
+  .tool-card,
+  .info-card { padding-left: 18px; padding-right: 18px; }
+}

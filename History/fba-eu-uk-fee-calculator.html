@@ -1,0 +1,1639 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amazon EU & UK FBA Fee Calculator</title>
+  <script src="./fba-fee-data.js"></script>
+  <script src="./fba-surcharge-rules.js"></script>
+  <style>
+    :root {
+      --bg: #f5efe7;
+      --panel: rgba(255, 250, 245, 0.84);
+      --panel-strong: #fffdf9;
+      --line: rgba(63, 46, 32, 0.12);
+      --ink: #1e1814;
+      --muted: #6a5f56;
+      --accent: #b65a34;
+      --accent-soft: rgba(182, 90, 52, 0.1);
+      --ok: #156f4d;
+      --warn: #a56513;
+      --danger: #ae4030;
+      --shadow: 0 28px 70px rgba(67, 43, 25, 0.12);
+      --radius: 26px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 32%),
+        radial-gradient(circle at 85% 10%, rgba(255, 214, 193, 0.5), rgba(255, 214, 193, 0) 28%),
+        linear-gradient(140deg, #efe4d7 0%, #f9f3ec 54%, #f2e8de 100%);
+      padding: 28px;
+    }
+
+    .app {
+      max-width: 1420px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      overflow: hidden;
+    }
+
+    .hero-copy {
+      padding: 36px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+      max-width: 12ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 62ch;
+      color: var(--muted);
+      line-height: 1.72;
+      font-size: 15px;
+    }
+
+    .hero-side {
+      padding: 30px;
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.74), rgba(255, 244, 236, 0.94)),
+        linear-gradient(135deg, #f6dfd1, #f7efe8);
+      border-left: 1px solid rgba(63, 46, 32, 0.08);
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      background: rgba(255, 253, 250, 0.86);
+      border-radius: 20px;
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .hero-list li {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .triple {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .double {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(182, 90, 52, 0.5);
+      box-shadow: 0 0 0 4px rgba(182, 90, 52, 0.12);
+    }
+
+    .toggle-wrap {
+      display: grid;
+      gap: 10px;
+    }
+
+    .toggle {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 252, 248, 0.72);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .toggle input {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .toggle strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .toggle span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #bc643b, #a74d27);
+      color: #fff;
+      box-shadow: 0 18px 30px rgba(182, 90, 52, 0.24);
+    }
+
+    .ghost {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .result-head h2 {
+      margin-bottom: 4px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(21, 111, 77, 0.1);
+      color: var(--ok);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 253, 249, 0.82);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .summary-card .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .summary-card .value {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .summary-card .sub {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .section {
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .section h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .breakdown,
+    .notes {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 253, 249, 0.82);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .row strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .row span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .amount {
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .amount.minus {
+      color: var(--ok);
+    }
+
+    .amount.plus {
+      color: var(--danger);
+    }
+
+    .note {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 253, 249, 0.82);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .note.warn {
+      background: rgba(165, 101, 19, 0.08);
+      border-color: rgba(165, 101, 19, 0.18);
+      color: var(--warn);
+    }
+
+    .note.danger {
+      background: rgba(174, 64, 48, 0.08);
+      border-color: rgba(174, 64, 48, 0.16);
+      color: var(--danger);
+    }
+
+    .empty {
+      padding: 26px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 252, 248, 0.88), rgba(255, 248, 242, 0.66));
+      border: 1px dashed rgba(182, 90, 52, 0.28);
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1080px) {
+      .hero,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-side {
+        border-left: 0;
+        border-top: 1px solid rgba(63, 46, 32, 0.08);
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 16px;
+      }
+
+      .hero-copy,
+      .hero-side,
+      .panel {
+        padding: 20px;
+      }
+
+      .triple,
+      .double,
+      .summary-grid,
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Amazon Rate Card 2026-02-01</div>
+        <h1>欧洲 + 英国 FBA 费用测算页</h1>
+        <p>
+          输入包装尺寸、重量、库存国和目的国，页面会自动判断产品属于哪个
+          <code>size tier</code>，并根据你选择的履约路径估算基础 FBA 运费，
+          同时标出可能叠加的附加费或折扣，例如 <code>Low-Price FBA</code>、
+          <code>Pan-EU oversize surcharge</code>、<code>Low-Inventory Cost Coverage Fee</code>、
+          <code>SIPP</code>、CEP 未参加附加费等。
+        </p>
+      </div>
+      <aside class="hero-side">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">覆盖站点</div>
+            <div class="stat-value">10</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">支持路径</div>
+            <div class="stat-value">Local / EFN / Remote</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">尺寸判断</div>
+            <div class="stat-value">自动</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">数据来源</div>
+            <div class="stat-value">Rate Card PDF</div>
+          </div>
+        </div>
+        <ul class="hero-list">
+          <li>同国库存 + 同国销售：按 Domestic / Local rate。</li>
+          <li>欧盟跨国：默认按 EFN；勾选 Pan-EU 后改用 local fee，并判断 Pan-EU surcharge。</li>
+          <li>英国与欧盟之间：按 Remote Fulfilment 规则，不混入 Pan-EU。</li>
+          <li>爱尔兰单独按 2026 rate card 中的 promotional rate 计算。</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <div class="stack">
+        <section class="panel">
+          <h2>输入参数</h2>
+          <p>主输入尽量保持简单；只有当你想判断 low-price、低库存费或 SIPP 时，再补下面的可选开关。</p>
+
+          <form id="fee-form" class="form-grid">
+            <div class="triple">
+              <div class="field">
+                <label for="length">长（cm）</label>
+                <input id="length" name="length" type="number" min="0" step="0.1" value="30" required />
+              </div>
+              <div class="field">
+                <label for="width">宽（cm）</label>
+                <input id="width" name="width" type="number" min="0" step="0.1" value="20" required />
+              </div>
+              <div class="field">
+                <label for="height">高（cm）</label>
+                <input id="height" name="height" type="number" min="0" step="0.1" value="8" required />
+              </div>
+            </div>
+
+            <div class="double">
+              <div class="field">
+                <label for="weight">包装重量（kg）</label>
+                <input id="weight" name="weight" type="number" min="0" step="0.001" value="0.75" required />
+              </div>
+              <div class="field">
+                <label for="price">售价（按目的站点币种，可选）</label>
+                <input id="price" name="price" type="number" min="0" step="0.01" placeholder="用于判断 low-price" />
+              </div>
+            </div>
+
+            <div class="double">
+              <div class="field">
+                <label for="origin">库存所在国家</label>
+                <select id="origin" name="origin"></select>
+              </div>
+              <div class="field">
+                <label for="destination">目的地国家 / 销售站点</label>
+                <select id="destination" name="destination"></select>
+              </div>
+            </div>
+
+            <div class="double">
+              <div class="field">
+                <label for="dos30">30 天 Days of Supply（可选）</label>
+                <input id="dos30" name="dos30" type="number" min="0" step="0.1" placeholder="用于 Low-Inventory fee" />
+              </div>
+              <div class="field">
+                <label for="dos90">90 天 Days of Supply（可选）</label>
+                <input id="dos90" name="dos90" type="number" min="0" step="0.1" placeholder="用于 Low-Inventory fee" />
+              </div>
+            </div>
+
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input id="fuel-logistics-surcharge" name="fuelLogisticsSurcharge" type="checkbox" checked />
+                <div>
+                  <strong>Fuel & logistics surcharge</strong>
+                  <span>默认按 2026-04-17 起的临时规则预估。UK / FR / DE / IT / ES / PL / SE / NL / IE / BE 会对基础 fulfilment fee 加收 1.5%。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="pan-eu" name="panEu" type="checkbox" />
+                <div>
+                  <strong>跨欧盟订单按 Pan-EU local fulfilment 计算</strong>
+                  <span>不勾选时，欧盟跨国默认按 EFN。勾选后跨国单会优先按本地费率计算，并额外判断 Pan-EU oversize surcharge。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="selected-category" name="selectedCategory" type="checkbox" />
+                <div>
+                  <strong>属于 selected parcel categories</strong>
+                  <span>适用于鞋服、箱包、grocery、床垫、pet food 等 PDF 指定类目；只影响 parcel-size 产品。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="low-price-special" name="lowPriceSpecial" type="checkbox" />
+                <div>
+                  <strong>Low-Price 的低阈值类目</strong>
+                  <span>Beauty / Health / Office / Grocery / Books / Amazon Device Accessories / Kitchen 等使用更低的 low-price 价格门槛。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="use-low-price" name="useLowPrice" type="checkbox" checked />
+                <div>
+                  <strong>如果满足 low-price，就用 low-price 作为主运费</strong>
+                  <span>结果区仍会同时展示 standard fee 和 low-price fee 的差异，方便你核对。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="cep-enrolled" name="cepEnrolled" type="checkbox" checked />
+                <div>
+                  <strong>德国库存已参加 CEP / Central Europe Programme</strong>
+                  <span>如果库存在德国但没参加 CEP，部分订单要加上额外 surcharge；德国本地费率也会从 CEP 切到 DE-only。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="hazmat" name="hazmat" type="checkbox" />
+                <div>
+                  <strong>含锂电或危险品</strong>
+                  <span>会叠加每件处理费：GBP 0.10 / EUR 0.10 / SEK 1.00 / PLN 0.40。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
+                <input id="sipp" name="sipp" type="checkbox" />
+                <div>
+                  <strong>已通过 SIPP / Ships in Product Packaging</strong>
+                  <span>非 oversize 会尝试给出 SIPP discount；如果是 oversize 且未勾选，本页会尝试加上 packaging fee。</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="action-row">
+              <button type="submit" class="primary">计算 FBA 费用</button>
+              <button type="button" id="example-btn" class="ghost">载入一个 Pan-EU 示例</button>
+            </div>
+            <div class="tiny">
+              页面按你提供的 PDF《Effective as of 1st February 2026》实现。未纳入本页总额的费用会单独提示，例如 storage、aged inventory、referral、prep、returns 等。
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="result-head">
+          <div>
+            <h2>计算结果</h2>
+            <p id="result-caption">先输入参数再点击计算，页面会自动给出 size tier、基础费率、附加费和说明。</p>
+          </div>
+          <div id="route-pill" class="pill" hidden></div>
+        </div>
+
+        <div id="result-root" class="empty">
+          结果会显示在这里。建议至少输入尺寸、重量、库存国和目的国；如果你还想判断 low-price 或 low-inventory fee，再补售价和 days of supply。
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <script>
+    const data = window.FBA_FEE_DATA;
+    const surchargeRules = window.FBA_SURCHARGE_RULES || {};
+    const countryOrder = ["UK", "DE", "FR", "IT", "ES", "NL", "SE", "PL", "BE", "IE"];
+
+    const form = document.getElementById("fee-form");
+    const resultRoot = document.getElementById("result-root");
+    const resultCaption = document.getElementById("result-caption");
+    const routePill = document.getElementById("route-pill");
+    const originSelect = document.getElementById("origin");
+    const destinationSelect = document.getElementById("destination");
+    const exampleBtn = document.getElementById("example-btn");
+
+    function populateCountries() {
+      countryOrder.forEach((code) => {
+        const meta = data.COUNTRIES[code];
+        const label = `${meta.label} (${code})`;
+        const originOption = document.createElement("option");
+        originOption.value = code;
+        originOption.textContent = label;
+        originSelect.appendChild(originOption);
+
+        const destOption = document.createElement("option");
+        destOption.value = code;
+        destOption.textContent = label;
+        destinationSelect.appendChild(destOption);
+      });
+
+      originSelect.value = "DE";
+      destinationSelect.value = "FR";
+    }
+
+    function sortedDims(length, width, height) {
+      return [length, width, height].sort((a, b) => b - a);
+    }
+
+    function fitsDims(dims, maxDims) {
+      return dims[0] <= maxDims[0] && dims[1] <= maxDims[1] && dims[2] <= maxDims[2];
+    }
+
+    function dimensionalWeightKg(length, width, height) {
+      return (length * width * height) / 5000;
+    }
+
+    function girthCm(dims) {
+      return dims[0] + (2 * dims[1]) + (2 * dims[2]);
+    }
+
+    function money(value, currency) {
+      const symbolMap = { GBP: "£", EUR: "€", SEK: "SEK ", PLN: "PLN " };
+      return `${symbolMap[currency] || ""}${Number(value).toFixed(2)}`;
+    }
+
+    function round2(value) {
+      return Math.round(value * 100) / 100;
+    }
+
+    function formatEffectiveDate(dateString) {
+      if (dateString === "2026-04-17") return "April 17, 2026";
+      return dateString;
+    }
+
+    function fuelLogisticsRuleEu(destination) {
+      if (typeof surchargeRules.getEuFuelLogisticsRule === "function") {
+        return surchargeRules.getEuFuelLogisticsRule(destination);
+      }
+      return {
+        applicable: false,
+        rate: 0,
+        effectiveDate: "2026-04-17",
+        scopeLabel: destination
+      };
+    }
+
+    function fuelLogisticsSurchargeEu(input, primaryFee) {
+      const rule = fuelLogisticsRuleEu(input.destination);
+      const enabled = input.fuelLogisticsSurcharge;
+      const surcharge = typeof surchargeRules.buildFuelLogisticsSurcharge === "function"
+        ? surchargeRules.buildFuelLogisticsSurcharge(rule, primaryFee.amount, enabled)
+        : {
+            label: "Fuel & logistics surcharge",
+            applicable: rule.applicable,
+            enabled,
+            applied: enabled && rule.applicable,
+            rate: rule.rate,
+            effectiveDate: rule.effectiveDate,
+            scopeLabel: rule.scopeLabel,
+            amount: enabled && rule.applicable ? round2(primaryFee.amount * rule.rate) : 0
+          };
+
+      const detail = rule.applicable
+        ? enabled
+          ? `Applies ${(rule.rate * 100).toFixed(1)}% to base fulfilment fee for ${rule.scopeLabel} from ${formatEffectiveDate(rule.effectiveDate)}.`
+          : `Available from ${formatEffectiveDate(rule.effectiveDate)} at ${(rule.rate * 100).toFixed(1)}% of base fulfilment fee; toggle currently off.`
+        : "Current temporary surcharge is not configured for this destination.";
+
+      return {
+        ...surcharge,
+        detail
+      };
+    }
+
+    function getInput() {
+      const payload = new FormData(form);
+      return {
+        length: Number(payload.get("length")),
+        width: Number(payload.get("width")),
+        height: Number(payload.get("height")),
+        weightKg: Number(payload.get("weight")),
+        price: payload.get("price") ? Number(payload.get("price")) : null,
+        origin: payload.get("origin"),
+        destination: payload.get("destination"),
+        dos30: payload.get("dos30") ? Number(payload.get("dos30")) : null,
+        dos90: payload.get("dos90") ? Number(payload.get("dos90")) : null,
+        panEu: payload.get("panEu") === "on",
+        selectedCategory: payload.get("selectedCategory") === "on",
+        lowPriceSpecial: payload.get("lowPriceSpecial") === "on",
+        useLowPrice: payload.get("useLowPrice") === "on",
+        cepEnrolled: payload.get("cepEnrolled") === "on",
+        hazmat: payload.get("hazmat") === "on",
+        sipp: payload.get("sipp") === "on",
+        fuelLogisticsSurcharge: payload.get("fuelLogisticsSurcharge") === "on"
+      };
+    }
+
+    function determineRoute(input) {
+      const origin = data.COUNTRIES[input.origin];
+      const destination = data.COUNTRIES[input.destination];
+
+      if (input.origin === input.destination) {
+        if (input.destination === "IE") {
+          return { mode: "ie_local", label: "IE Domestic / Pan-EU", currency: "EUR", crossBorderPanEU: false };
+        }
+        return { mode: "local", label: "Domestic / Local", currency: destination.currency, crossBorderPanEU: false };
+      }
+
+      if (input.origin === "UK" && input.destination === "IE") {
+        return { mode: "ie_remote", label: "Remote Fulfilment UK -> IE", currency: "EUR", crossBorderPanEU: false };
+      }
+
+      if (input.origin === "IE" && input.destination === "UK") {
+        return { mode: "unsupported", reason: "这份 rate card 没有给出 IE -> UK 的 remote fulfilment 费率。" };
+      }
+
+      if (origin.isEU && destination.isEU) {
+        if (input.destination === "IE") {
+          return input.panEu
+            ? { mode: "ie_local", label: "Pan-EU -> IE local fee", currency: "EUR", crossBorderPanEU: true }
+            : { mode: "ie_efn", label: "Ireland EFN", currency: "EUR", crossBorderPanEU: false };
+        }
+        return input.panEu
+          ? { mode: "local", label: "Pan-EU local fulfilment", currency: destination.currency, crossBorderPanEU: true }
+          : { mode: "efn", label: "European Fulfilment Network", currency: destination.currency, crossBorderPanEU: false };
+      }
+
+      if (input.origin === "UK" && destination.isEU) {
+        return { mode: "remote_uk_to_eu", label: "Remote Fulfilment UK -> EU", currency: destination.currency, crossBorderPanEU: false };
+      }
+
+      if (input.destination === "UK") {
+        return { mode: "remote_eu_to_uk", label: "Remote Fulfilment EU -> UK", currency: "GBP", crossBorderPanEU: false };
+      }
+
+      return { mode: "unsupported", reason: "这个国家组合不在当前 PDF 费率表的已知路径中。" };
+    }
+
+    function classifySelectedParcel(input, tiers) {
+      const dims = sortedDims(input.length, input.width, input.height);
+      return tiers.find((tier) => fitsDims(dims, tier.maxDims) && input.weightKg <= tier.maxUnitWeightKg) || null;
+    }
+
+    function classifyEuropeStandard(input) {
+      const dims = sortedDims(input.length, input.width, input.height);
+      const dimWeight = dimensionalWeightKg(input.length, input.width, input.height);
+      const girth = girthCm(dims);
+      const longest = dims[0];
+
+      if (input.weightKg > 31.5 || longest > 175 || girth > 360) {
+        return data.LOCAL_STANDARD.find((item) => item.key === "special-oversize");
+      }
+
+      const byKey = (key) => data.LOCAL_STANDARD.find((item) => item.key === key);
+
+      if (fitsDims(dims, [33, 23, 2.5]) && input.weightKg <= 0.1) return byKey("light-envelope");
+      if (fitsDims(dims, [33, 23, 2.5]) && input.weightKg <= 0.46) return byKey("standard-envelope");
+      if (fitsDims(dims, [33, 23, 4]) && input.weightKg <= 0.96) return byKey("large-envelope");
+      if (fitsDims(dims, [33, 23, 6]) && input.weightKg <= 0.96) return byKey("extra-large-envelope");
+      if (fitsDims(dims, [35, 25, 12]) && input.weightKg <= 3.9 && dimWeight <= 2.1) return byKey("small-parcel");
+      if (fitsDims(dims, [45, 34, 26]) && input.weightKg <= 11.9 && dimWeight <= 7.96) return byKey("standard-parcel");
+      if (fitsDims(dims, [61, 46, 46]) && input.weightKg <= 1.76 && dimWeight <= 25.82) return byKey("small-oversize");
+      if (fitsDims(dims, [101, 60, 60]) && input.weightKg <= 15 && dimWeight <= 72.72) return byKey("standard-oversize-light");
+      if (fitsDims(dims, [101, 60, 60]) && input.weightKg > 15 && input.weightKg <= 23 && dimWeight <= 72.72) return byKey("standard-oversize-heavy");
+      if (fitsDims(dims, [120, 60, 60]) && input.weightKg <= 23 && dimWeight <= 86.4) return byKey("standard-oversize-large");
+      if (input.weightKg > 23 && input.weightKg <= 31.5 && dimWeight <= 126) return byKey("heavy-oversize");
+      if (input.weightKg <= 23 && dimWeight <= 126) return byKey("bulky-oversize");
+      return byKey("special-oversize");
+    }
+
+    function classifyIELowPrice(input) {
+      const dims = sortedDims(input.length, input.width, input.height);
+      return data.IE_LOW_PRICE.find((tier) => fitsDims(dims, tier.maxDims) && input.weightKg <= tier.maxUnitWeightKg) || null;
+    }
+
+    function classifyIEStandard(input) {
+      const dims = sortedDims(input.length, input.width, input.height);
+      const dimWeight = dimensionalWeightKg(input.length, input.width, input.height);
+      const girth = girthCm(dims);
+      const longest = dims[0];
+
+      if (input.weightKg > 31.5 || longest > 175 || girth > 360) {
+        return { key: "special-oversize", label: "Special oversize", unsupported: true };
+      }
+
+      const byKey = (key) => data.IE_STANDARD.find((item) => item.key === key);
+
+      if (fitsDims(dims, [20, 15, 1]) && input.weightKg <= 0.08) return byKey("small-envelope");
+      if (fitsDims(dims, [33, 23, 2.5]) && input.weightKg <= 0.46) return byKey("standard-envelope");
+      if (fitsDims(dims, [33, 23, 4]) && input.weightKg <= 0.96) return byKey("large-envelope");
+      if (fitsDims(dims, [33, 23, 6]) && input.weightKg <= 0.96) return byKey("extra-large-envelope");
+      if (fitsDims(dims, [35, 25, 12]) && input.weightKg <= 3.9 && dimWeight <= 2.1) return byKey("small-parcel");
+      if (fitsDims(dims, [45, 34, 26]) && input.weightKg <= 11.9 && dimWeight <= 7.96) return byKey("standard-parcel");
+      if (fitsDims(dims, [61, 46, 46]) && input.weightKg <= 1.76 && dimWeight <= 25.82) return byKey("small-oversize");
+      if (fitsDims(dims, [120, 60, 60]) && input.weightKg < 29.76 && dimWeight < 86.4) return byKey("standard-oversize");
+      if (input.weightKg <= 31.5) return byKey("large-oversize");
+      return { key: "special-oversize", label: "Special oversize", unsupported: true };
+    }
+
+    function classifyLowPriceGeneral(input) {
+      const dims = sortedDims(input.length, input.width, input.height);
+      for (const tier of data.LOCAL_LOW_PRICE) {
+        if (!fitsDims(dims, tier.maxDims)) continue;
+        const matchedBand = tier.bands.find((band) => input.weightKg <= band.maxWeightKg);
+        if (matchedBand) {
+          return { tier, band: matchedBand };
+        }
+      }
+      return null;
+    }
+
+    function shippingWeightForTier(input, tier, forceUnitWeight = false) {
+      const dimWeight = dimensionalWeightKg(input.length, input.width, input.height);
+      if (forceUnitWeight) {
+        return { shippingWeightKg: input.weightKg, basis: "unit", dimWeightKg: dimWeight };
+      }
+      if (tier.shippingWeight === "unit") {
+        return { shippingWeightKg: input.weightKg, basis: "unit", dimWeightKg: dimWeight };
+      }
+      if (tier.shippingWeight === "max") {
+        return {
+          shippingWeightKg: Math.max(input.weightKg, dimWeight),
+          basis: dimWeight > input.weightKg ? "dimensional" : "unit",
+          dimWeightKg: dimWeight
+        };
+      }
+      return { shippingWeightKg: input.weightKg, basis: "unit", dimWeightKg: dimWeight };
+    }
+
+    function selectLocalColumn(destination, cepEnrolled) {
+      if (destination === "DE") {
+        return cepEnrolled ? "CEP" : "DE";
+      }
+      return destination;
+    }
+
+    function selectEfnStandardColumn(route, input) {
+      if (route.mode === "efn") {
+        if (input.destination === "DE") return input.cepEnrolled ? "EU4" : "DE_NON_CEE";
+        if (["FR", "IT", "ES"].includes(input.destination)) return "EU4";
+        if (["NL", "BE"].includes(input.destination)) return "NLBE";
+        if (["SE", "PL"].includes(input.destination)) return input.destination;
+        return null;
+      }
+      if (route.mode === "remote_uk_to_eu") {
+        if (["DE", "FR", "IT", "ES"].includes(input.destination)) return "UK_TO_EU4";
+        if (input.destination === "NL") return "UK_TO_NL";
+        if (input.destination === "SE") return "UK_TO_SE";
+        return null;
+      }
+      if (route.mode === "remote_eu_to_uk") {
+        return ["DE", "FR", "IT", "ES"].includes(input.origin) ? "EU4_TO_UK" : null;
+      }
+      return null;
+    }
+
+    function selectEfnSelectedColumn(route, input) {
+      if (route.mode === "efn") {
+        if (input.destination === "DE") return input.cepEnrolled ? "CEP" : "DE";
+        if (["FR", "IT", "ES", "NL", "PL", "BE", "SE"].includes(input.destination)) return input.destination;
+        return null;
+      }
+      if (route.mode === "remote_uk_to_eu") {
+        if (["DE", "FR", "IT", "ES"].includes(input.destination)) return "UK_TO_EU4";
+        if (["NL", "BE"].includes(input.destination)) return "UK_TO_NLBE";
+        if (input.destination === "SE") return "UK_TO_SE";
+        return null;
+      }
+      if (route.mode === "remote_eu_to_uk") {
+        return ["DE", "FR", "IT", "ES"].includes(input.origin) ? "EU4_TO_UK" : null;
+      }
+      return null;
+    }
+
+    function feeFromBands(bands, shippingWeightKg) {
+      return bands.find((band) => shippingWeightKg <= band.maxWeightKg + 1e-9) || null;
+    }
+
+    function feeFromPerKg(baseBandMaxKg, baseFee, incrementFee, shippingWeightKg) {
+      if (shippingWeightKg <= baseBandMaxKg) return baseFee;
+      return baseFee + ((shippingWeightKg - baseBandMaxKg) * incrementFee);
+    }
+
+    function feeFromPer100g(baseFee, incrementFee, shippingWeightKg) {
+      if (shippingWeightKg <= 0.1) return baseFee;
+      const extraSteps = Math.ceil((shippingWeightKg - 0.1) / 0.1 - 1e-9);
+      return baseFee + (extraSteps * incrementFee);
+    }
+
+    function computeStandardBase(input, route, notes) {
+      const currency = route.currency;
+      const isIERoute = route.mode.startsWith("ie_");
+      const selectedTier = input.selectedCategory
+        ? classifySelectedParcel(input, isIERoute ? data.IE_SELECTED : data.SELECTED_LOCAL_PARCEL)
+        : null;
+
+      if (input.selectedCategory && !selectedTier) {
+        notes.push({ type: "warn", text: "你勾选了 selected parcel categories，但当前商品不属于 parcel-size；本次已回退到标准尺寸费表。" });
+      }
+
+      if (isIERoute) {
+        if (selectedTier) {
+          const shippingWeightKg = input.weightKg;
+          const ieTier = data.IE_SELECTED.find((item) => item.key === selectedTier.key);
+          const feeKey = route.mode === "ie_local" ? "local" : route.mode === "ie_efn" ? "efn" : "remote";
+          const amount = feeFromPer100g(ieTier[feeKey], ieTier.increments[feeKey], shippingWeightKg);
+          return {
+            kind: "standard",
+            tableLabel: "Ireland promotional fee",
+            sizeKey: ieTier.key,
+            sizeLabel: ieTier.label,
+            amount: round2(amount),
+            currency,
+            shippingWeightKg,
+            dimWeightKg: dimensionalWeightKg(input.length, input.width, input.height),
+            basis: "unit",
+            selectedParcelTier: true
+          };
+        }
+
+        const ieTier = classifyIEStandard(input);
+        if (!ieTier || ieTier.unsupported) {
+          return { error: "当前输入在爱尔兰费率页中落入 Special oversize 或未给出报价的区间，需要人工复核。" };
+        }
+
+        const weightInfo = shippingWeightForTier(input, ieTier);
+        if (ieTier.bands) {
+          const band = feeFromBands(ieTier.bands, weightInfo.shippingWeightKg);
+          if (!band) return { error: "没找到对应的爱尔兰重量档位。" };
+          const feeKey = route.mode === "ie_local" ? "local" : route.mode === "ie_efn" ? "efn" : "remote";
+          return {
+            kind: "standard",
+            tableLabel: "Ireland promotional fee",
+            sizeKey: ieTier.key,
+            sizeLabel: ieTier.label,
+            amount: round2(band[feeKey]),
+            currency,
+            shippingWeightKg: weightInfo.shippingWeightKg,
+            dimWeightKg: weightInfo.dimWeightKg,
+            basis: weightInfo.basis,
+            selectedParcelTier: false
+          };
+        }
+
+        if (ieTier.increment) {
+          const feeKey = route.mode === "ie_local" ? "local" : route.mode === "ie_efn" ? "efn" : "remote";
+          const matchedBand = ieTier.bands.find((band) => weightInfo.shippingWeightKg <= band.maxWeightKg + 1e-9);
+          const amount = matchedBand
+            ? matchedBand[feeKey]
+            : feeFromPerKg(ieTier.incrementFromKg, ieTier.bands[ieTier.bands.length - 1][feeKey], ieTier.increment[feeKey], weightInfo.shippingWeightKg);
+          return {
+            kind: "standard",
+            tableLabel: "Ireland promotional fee",
+            sizeKey: ieTier.key,
+            sizeLabel: ieTier.label,
+            amount: round2(amount),
+            currency,
+            shippingWeightKg: weightInfo.shippingWeightKg,
+            dimWeightKg: weightInfo.dimWeightKg,
+            basis: weightInfo.basis,
+            selectedParcelTier: false
+          };
+        }
+
+        return { error: "爱尔兰费率匹配失败。" };
+      }
+
+      if (route.mode === "local") {
+        if (selectedTier) {
+          const tier = data.SELECTED_LOCAL_PARCEL.find((item) => item.key === selectedTier.key);
+          const feeColumn = selectLocalColumn(input.destination, input.cepEnrolled);
+          const amount = feeFromPer100g(tier.baseFees[feeColumn], tier.incrementFees[feeColumn], input.weightKg);
+          return {
+            kind: "standard",
+            tableLabel: "Local / Pan-EU parcel selected categories",
+            sizeKey: tier.key,
+            sizeLabel: tier.label,
+            amount: round2(amount),
+            currency,
+            shippingWeightKg: input.weightKg,
+            dimWeightKg: dimensionalWeightKg(input.length, input.width, input.height),
+            basis: "unit",
+            selectedParcelTier: true
+          };
+        }
+
+        const tier = classifyEuropeStandard(input);
+        const weightInfo = shippingWeightForTier(input, tier);
+        const feeColumn = selectLocalColumn(input.destination, input.cepEnrolled);
+
+        if (tier.bands) {
+          const band = feeFromBands(tier.bands, weightInfo.shippingWeightKg);
+          if (!band || band.fees[feeColumn] == null) {
+            return { error: "这个站点 / size tier 在 local fee 表中没有明确报价。" };
+          }
+          return {
+            kind: "standard",
+            tableLabel: "Domestic / Local / Pan-EU fee",
+            sizeKey: tier.key,
+            sizeLabel: tier.label,
+            amount: round2(band.fees[feeColumn]),
+            currency,
+            shippingWeightKg: weightInfo.shippingWeightKg,
+            dimWeightKg: weightInfo.dimWeightKg,
+            basis: weightInfo.basis,
+            selectedParcelTier: false
+          };
+        }
+
+        if (tier.baseFees && tier.baseFees[feeColumn] != null) {
+          return {
+            kind: "standard",
+            tableLabel: "Domestic / Local / Pan-EU fee",
+            sizeKey: tier.key,
+            sizeLabel: tier.label,
+            amount: round2(feeFromPerKg(tier.baseBandMaxKg, tier.baseFees[feeColumn], tier.incrementFees[feeColumn], weightInfo.shippingWeightKg)),
+            currency,
+            shippingWeightKg: weightInfo.shippingWeightKg,
+            dimWeightKg: weightInfo.dimWeightKg,
+            basis: weightInfo.basis,
+            selectedParcelTier: false
+          };
+        }
+
+        return { error: "无法从 local rate card 取得对应费率。" };
+      }
+
+      if (route.mode === "efn" || route.mode === "remote_uk_to_eu" || route.mode === "remote_eu_to_uk") {
+        if (selectedTier) {
+          const tier = data.SELECTED_EFN_PARCEL.find((item) => item.key === selectedTier.key);
+          const feeColumn = selectEfnSelectedColumn(route, input);
+          if (!feeColumn || tier.baseFees[feeColumn] == null) {
+            return { error: "这条 Remote / EFN 路径在 selected parcel fee 表里没有明确报价。" };
+          }
+          return {
+            kind: "standard",
+            tableLabel: "EFN / Remote parcel selected categories",
+            sizeKey: tier.key,
+            sizeLabel: tier.label,
+            amount: round2(feeFromPer100g(tier.baseFees[feeColumn], tier.incrementFees[feeColumn], input.weightKg)),
+            currency,
+            shippingWeightKg: input.weightKg,
+            dimWeightKg: dimensionalWeightKg(input.length, input.width, input.height),
+            basis: "unit",
+            selectedParcelTier: true
+          };
+        }
+
+        const baseTier = classifyEuropeStandard(input);
+        if (baseTier.key === "special-oversize") {
+          return { error: "EFN / Remote 表里没有 Special oversize 报价，需要人工复核。" };
+        }
+        const tier = data.EFN_STANDARD.find((item) => item.key === baseTier.key);
+        if (!tier) {
+          return { error: "没有找到与当前 size tier 对应的 EFN / Remote 费率行。" };
+        }
+        const weightInfo = shippingWeightForTier(input, tier);
+        const feeColumn = selectEfnStandardColumn(route, input);
+        if (!feeColumn) {
+          return { error: "当前 Remote / EFN 路径在 PDF 中没有对应费率列。" };
+        }
+
+        if (tier.bands) {
+          const band = feeFromBands(tier.bands, weightInfo.shippingWeightKg);
+          if (!band || band.fees[feeColumn] == null) {
+            return { error: "当前重量档在 EFN / Remote 表中没有报价。" };
+          }
+          return {
+            kind: "standard",
+            tableLabel: "EFN / Remote fulfilment fee",
+            sizeKey: tier.key,
+            sizeLabel: tier.label,
+            amount: round2(band.fees[feeColumn]),
+            currency,
+            shippingWeightKg: weightInfo.shippingWeightKg,
+            dimWeightKg: weightInfo.dimWeightKg,
+            basis: weightInfo.basis,
+            selectedParcelTier: false
+          };
+        }
+
+        if (tier.baseFees && tier.baseFees[feeColumn] != null) {
+          return {
+            kind: "standard",
+            tableLabel: "EFN / Remote fulfilment fee",
+            sizeKey: tier.key,
+            sizeLabel: tier.label,
+            amount: round2(feeFromPerKg(tier.baseBandMaxKg, tier.baseFees[feeColumn], tier.incrementFees[feeColumn], weightInfo.shippingWeightKg)),
+            currency,
+            shippingWeightKg: weightInfo.shippingWeightKg,
+            dimWeightKg: weightInfo.dimWeightKg,
+            basis: weightInfo.basis,
+            selectedParcelTier: false
+          };
+        }
+
+        return { error: "无法匹配 EFN / Remote 基础费率。" };
+      }
+
+      return { error: "未识别的费率路径。" };
+    }
+
+    function computeLowPrice(input, route) {
+      if (input.price == null) {
+        return { eligible: false, reason: "未输入售价，所以无法判断 low-price 资格。" };
+      }
+
+      const thresholdGroup = input.lowPriceSpecial ? "special" : "general";
+      const threshold = data.LOW_PRICE_THRESHOLDS[thresholdGroup][input.destination];
+
+      if (threshold == null) {
+        return { eligible: false, reason: "当前目的站点没有 low-price threshold。" };
+      }
+
+      if (input.price > threshold) {
+        return {
+          eligible: false,
+          reason: `售价 ${input.price.toFixed(2)} 已高于当前站点的 low-price 门槛 ${threshold.toFixed(2)}。`,
+          threshold
+        };
+      }
+
+      const currency = data.COUNTRIES[input.destination].currency;
+
+      if (route.mode === "ie_local" || route.mode === "ie_efn" || route.mode === "ie_remote") {
+        const ieTier = classifyIELowPrice(input);
+        if (!ieTier) {
+          return { eligible: false, threshold, reason: "尺寸或重量超出 IE low-price 费表可覆盖范围。" };
+        }
+        const feeKey = route.mode === "ie_local" ? "local" : route.mode === "ie_efn" ? "efn" : "remote";
+        return {
+          eligible: true,
+          threshold,
+          tableLabel: "Ireland low-price promotional fee",
+          sizeKey: ieTier.key,
+          sizeLabel: ieTier.label,
+          amount: round2(ieTier[feeKey]),
+          currency,
+          shippingWeightKg: input.weightKg,
+          dimWeightKg: dimensionalWeightKg(input.length, input.width, input.height),
+          basis: "unit"
+        };
+      }
+
+      if (route.mode !== "local") {
+        return {
+          eligible: false,
+          threshold,
+          reason: "欧洲普通站点的 low-price 只适用于 Local / Pan-EU，不适用于 EFN / UK-EU Remote。"
+        };
+      }
+
+      const lowPriceMatch = classifyLowPriceGeneral(input);
+      if (!lowPriceMatch) {
+        return {
+          eligible: false,
+          threshold,
+          reason: "尺寸或重量超出普通欧洲站点 low-price 费表可覆盖范围。"
+        };
+      }
+
+      const feeColumn = selectLocalColumn(input.destination, input.cepEnrolled);
+      const amount = lowPriceMatch.band.fees[feeColumn];
+      if (amount == null) {
+        return { eligible: false, threshold, reason: "当前站点 low-price 表里没有找到对应报价。" };
+      }
+
+      return {
+        eligible: true,
+        threshold,
+        tableLabel: "Low-price local / Pan-EU fee",
+        sizeKey: lowPriceMatch.tier.key,
+        sizeLabel: lowPriceMatch.tier.label,
+        amount: round2(amount),
+        currency,
+        shippingWeightKg: input.weightKg,
+        dimWeightKg: dimensionalWeightKg(input.length, input.width, input.height),
+        basis: "unit"
+      };
+    }
+
+    function maybeAddCepSurcharge(input, route, primaryFee, breakdown) {
+      if (input.origin !== "DE" || input.cepEnrolled || input.destination === "DE") return;
+      if (!["local", "efn", "remote_eu_to_uk", "ie_local", "ie_efn"].includes(route.mode)) return;
+      const amount = data.CEP_SURCHARGE[input.destination];
+      if (amount == null) return;
+      breakdown.push({
+        label: "CEP 未参加附加费",
+        detail: "库存位于德国且未参加 Central Europe Programme，按 PDF footnote 叠加。",
+        amount,
+        currency: primaryFee.currency,
+        kind: "plus"
+      });
+    }
+
+    function maybeAddHazmatFee(input, primaryFee, breakdown) {
+      if (!input.hazmat) return;
+      const amount = data.HAZMAT_SURCHARGE[primaryFee.currency];
+      if (amount == null) return;
+      breakdown.push({
+        label: "Hazmat / Lithium surcharge",
+        detail: "含锂电或危险品的 per-unit handling fee。",
+        amount,
+        currency: primaryFee.currency,
+        kind: "plus"
+      });
+    }
+
+    function maybeAddPanEuOversizeSurcharge(input, route, primaryFee, breakdown, notes) {
+      if (!(route.mode === "local" && route.crossBorderPanEU && input.origin !== input.destination)) return;
+      if (!primaryFee.sizeKey.includes("oversize")) return;
+      if (primaryFee.sizeKey === "special-oversize") {
+        notes.push({ type: "warn", text: "Pan-EU oversize surcharge 不适用于 Special oversize，本页未叠加。" });
+        return;
+      }
+      if (input.destination === "SE") {
+        breakdown.push({
+          label: "Pan-EU oversize surcharge",
+          detail: "瑞典 oversize（不含 special oversize）按 PDF 记固定 SEK 20。",
+          amount: 20,
+          currency: "SEK",
+          kind: "plus"
+        });
+        return;
+      }
+      const surchargeRule = data.PAN_EU_OVERSIZE_SURCHARGE[primaryFee.sizeKey];
+      if (!surchargeRule || surchargeRule.baseFees[input.destination] == null) {
+        notes.push({ type: "warn", text: "当前目的站点没有公开的 Pan-EU oversize surcharge 列，本页未叠加。" });
+        return;
+      }
+      const amount = feeFromPerKg(
+        surchargeRule.baseBandMaxKg,
+        surchargeRule.baseFees[input.destination],
+        surchargeRule.incrementFees[input.destination],
+        primaryFee.shippingWeightKg
+      );
+      breakdown.push({
+        label: "Pan-EU oversize surcharge",
+        detail: "跨国 Pan-EU 本地履约且为 oversize 时叠加。",
+        amount: round2(amount),
+        currency: primaryFee.currency,
+        kind: "plus"
+      });
+    }
+
+    function lowInventoryBand(dos30, dos90) {
+      if (dos30 == null || dos90 == null) return null;
+      if (dos30 < 14 && dos90 < 14) return "lt14";
+      if (dos30 < 21 && dos90 < 21) return "lt21";
+      if (dos30 < 28 && dos90 < 28) return "lt28";
+      return null;
+    }
+
+    function maybeAddLowInventoryFee(input, route, primaryFee, usingLowPrice, breakdown) {
+      if (usingLowPrice) return;
+      if (route.mode !== "local" || !input.panEu) return;
+      if (!["DE", "FR", "IT", "ES"].includes(input.destination)) return;
+      const band = lowInventoryBand(input.dos30, input.dos90);
+      if (!band) return;
+      const feeTable = primaryFee.selectedParcelTier ? data.LOW_INVENTORY_SELECTED : data.LOW_INVENTORY_STANDARD;
+      const tierFee = feeTable[primaryFee.sizeKey];
+      if (!tierFee) return;
+      breakdown.push({
+        label: "Pan-EU Low-Inventory Cost Coverage Fee",
+        detail: `30 天和 90 天 days of supply 同时低于 28 天，本次命中 ${band} 档。`,
+        amount: tierFee[band],
+        currency: "EUR",
+        kind: "plus"
+      });
+    }
+
+    function maybeAddSippAdjustment(input, route, primaryFee, usingLowPrice, breakdown, notes) {
+      const supportedCountries = ["UK", "DE", "FR", "IT", "ES"];
+      if (!supportedCountries.includes(input.destination)) return;
+      if (!["local", "efn"].includes(route.mode)) return;
+      if (route.mode === "local" && input.destination === "IE") return;
+
+      if (input.sipp) {
+        let discount = null;
+        if (usingLowPrice) {
+          const discountBands = data.SIPP_LOW_PRICE[primaryFee.sizeKey];
+          if (discountBands) {
+            const matchedBand = feeFromBands(discountBands, primaryFee.shippingWeightKg);
+            discount = matchedBand ? matchedBand.fees[input.destination] : null;
+          }
+        } else if (primaryFee.selectedParcelTier) {
+          const fee = data.SIPP_SELECTED[primaryFee.sizeKey];
+          discount = fee ? fee[input.destination] : null;
+        } else {
+          const discountBands = data.SIPP_STANDARD[primaryFee.sizeKey];
+          if (discountBands) {
+            const matchedBand = feeFromBands(discountBands, primaryFee.shippingWeightKg);
+            discount = matchedBand ? matchedBand.fees[input.destination] : null;
+          }
+        }
+
+        if (discount != null) {
+          breakdown.push({
+            label: "SIPP discount",
+            detail: "已勾选 Ships in Product Packaging，可从 fulfilment fee 中减去。",
+            amount: discount,
+            currency: primaryFee.currency,
+            kind: "minus"
+          });
+        } else {
+          notes.push({ type: "warn", text: "当前 size tier 没有找到公开的 SIPP discount，结果未扣减。" });
+        }
+        return;
+      }
+
+      const packagingRule = data.OVERSIZE_PACKAGING_FEES[primaryFee.sizeKey];
+      if (!packagingRule) return;
+      const amount = feeFromPerKg(
+        packagingRule.baseBandMaxKg,
+        packagingRule.baseFees[input.destination],
+        packagingRule.incrementFees[input.destination],
+        primaryFee.shippingWeightKg
+      );
+      breakdown.push({
+        label: "Oversize packaging fee",
+        detail: "oversize 且未走 SIPP 时，按 PDF 的 packaging fee 估算。",
+        amount: round2(amount),
+        currency: primaryFee.currency,
+        kind: "plus"
+      });
+    }
+
+    function renderResults(view) {
+      const breakdownHtml = view.breakdown.map((item) => `
+        <div class="row">
+          <div>
+            <strong>${item.label}</strong>
+            <span>${item.detail}</span>
+          </div>
+          <div class="amount ${item.kind}">${item.kind === "minus" ? "-" : "+"}${money(item.amount, item.currency)}</div>
+        </div>
+      `).join("");
+
+      const notesHtml = view.notes.map((item) => `
+        <div class="note ${item.type === "danger" ? "danger" : item.type === "warn" ? "warn" : ""}">
+          ${item.text}
+        </div>
+      `).join("");
+
+      const altFeeHtml = view.altFee ? `
+        <div class="row">
+          <div>
+            <strong>${view.altFee.title}</strong>
+            <span>${view.altFee.detail}</span>
+          </div>
+          <div class="amount">${money(view.altFee.amount, view.altFee.currency)}</div>
+        </div>
+      ` : "";
+
+      resultRoot.className = "";
+      resultRoot.innerHTML = `
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="label">主运费</div>
+            <span class="value">${money(view.primaryTotal, view.currency)}</span>
+            <div class="sub">${view.primaryLabel}</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Size Tier</div>
+            <span class="value">${view.sizeLabel}</span>
+            <div class="sub">${view.sizeMeta}</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">计费重量</div>
+            <span class="value">${view.shippingWeightLabel}</span>
+            <div class="sub">${view.weightMeta}</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>费率拆解</h3>
+          <div class="breakdown">
+            <div class="row">
+              <div>
+                <strong>${view.baseFeeTitle}</strong>
+                <span>${view.baseFeeDetail}</span>
+              </div>
+              <div class="amount">${money(view.baseFeeAmount, view.currency)}</div>
+            </div>
+            <div class="row">
+              <div>
+                <strong>${view.fuelLogistics.label}</strong>
+                <span>${view.fuelLogistics.detail}</span>
+              </div>
+              <div class="amount ${view.fuelLogistics.applicable && view.fuelLogistics.enabled ? "plus" : ""}">${!view.fuelLogistics.applicable ? "Not applicable" : view.fuelLogistics.enabled ? `+${money(view.fuelLogistics.amount, view.currency)}` : "Not applied"}</div>
+            </div>
+            ${altFeeHtml}
+            ${breakdownHtml || '<div class="note">当前输入下没有额外叠加的 surcharge / discount。</div>'}
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>说明与边界</h3>
+          <div class="notes">
+            ${notesHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function calculate() {
+      const input = getInput();
+      const dimsValid = [input.length, input.width, input.height, input.weightKg].every((value) => Number.isFinite(value) && value > 0);
+      if (!dimsValid) {
+        resultRoot.className = "empty";
+        resultRoot.textContent = "请先输入合法的尺寸和重量。";
+        routePill.hidden = true;
+        return;
+      }
+
+      const route = determineRoute(input);
+      if (route.mode === "unsupported") {
+        resultRoot.className = "";
+        resultRoot.innerHTML = `<div class="note danger">${route.reason}</div>`;
+        resultCaption.textContent = "当前路径没有找到公开费率。";
+        routePill.hidden = true;
+        return;
+      }
+
+      const notes = [];
+      const standardBase = computeStandardBase(input, route, notes);
+      if (standardBase.error) {
+        resultRoot.className = "";
+        resultRoot.innerHTML = `<div class="note danger">${standardBase.error}</div>`;
+        resultCaption.textContent = "基础费率无法自动匹配。";
+        routePill.hidden = false;
+        routePill.textContent = route.label;
+        return;
+      }
+
+      const lowPrice = computeLowPrice(input, route);
+      let primaryFee = standardBase;
+      let altFee = null;
+      let usingLowPrice = false;
+
+      if (lowPrice.eligible) {
+        altFee = {
+          title: input.useLowPrice ? "Standard fee（对比）" : "Low-price fee（对比）",
+          detail: input.useLowPrice
+            ? `${standardBase.tableLabel}，用来对比你若不走 low-price 时的基础费。`
+            : `${lowPrice.tableLabel}，你当前满足 low-price 门槛，但主运费未切换。`,
+          amount: input.useLowPrice ? standardBase.amount : lowPrice.amount,
+          currency: route.currency
+        };
+
+        if (input.useLowPrice) {
+          usingLowPrice = true;
+          primaryFee = {
+            ...lowPrice,
+            selectedParcelTier: false
+          };
+        }
+
+        notes.push({
+          type: "info",
+          text: `当前售价满足 low-price 门槛：${money(lowPrice.threshold, route.currency)}。${input.useLowPrice ? "主结果已切换为 low-price fee。" : "你关闭了自动切换，所以主结果仍按 standard fee 展示。"}`
+        });
+      } else if (lowPrice.reason) {
+        notes.push({ type: "info", text: lowPrice.reason });
+      }
+
+      const breakdown = [];
+      maybeAddCepSurcharge(input, route, primaryFee, breakdown);
+      maybeAddHazmatFee(input, primaryFee, breakdown);
+      maybeAddPanEuOversizeSurcharge(input, route, primaryFee, breakdown, notes);
+      maybeAddLowInventoryFee(input, route, primaryFee, usingLowPrice, breakdown);
+      maybeAddSippAdjustment(input, route, primaryFee, usingLowPrice, breakdown, notes);
+      const fuelLogistics = fuelLogisticsSurchargeEu(input, primaryFee);
+
+      const total = round2(
+        primaryFee.amount + fuelLogistics.amount + breakdown.reduce((sum, item) => {
+          return sum + (item.kind === "minus" ? -item.amount : item.amount);
+        }, 0)
+      );
+
+      const dims = sortedDims(input.length, input.width, input.height);
+      resultCaption.textContent = `按 ${route.label} 路径估算，币种为 ${route.currency}。`;
+      routePill.hidden = false;
+      routePill.textContent = route.label;
+
+      renderResults({
+        currency: route.currency,
+        primaryTotal: total,
+        primaryLabel: usingLowPrice ? "已使用 low-price 作为主运费" : "已使用 standard / local / EFN / remote 作为主运费",
+        sizeLabel: primaryFee.sizeLabel,
+        sizeMeta: `最长边 ${dims[0].toFixed(1)} cm，次长边 ${dims[1].toFixed(1)} cm，最短边 ${dims[2].toFixed(1)} cm`,
+        shippingWeightLabel: `${primaryFee.shippingWeightKg.toFixed(2)} kg`,
+        weightMeta: `实重 ${input.weightKg.toFixed(3)} kg，体积重 ${primaryFee.dimWeightKg.toFixed(2)} kg，当前取 ${primaryFee.basis === "dimensional" ? "dimensional weight" : "unit weight"}`,
+        baseFeeTitle: usingLowPrice ? "Low-price 基础费" : "基础 fulfilment fee",
+        baseFeeDetail: `${primaryFee.tableLabel}，size tier = ${primaryFee.sizeLabel}`,
+        baseFeeAmount: primaryFee.amount,
+        fuelLogistics,
+        altFee,
+        breakdown,
+        notes: [
+          ...notes,
+          { type: "info", text: fuelLogistics.detail },
+          { type: "info", text: "未自动计入 storage fee、aged inventory surcharge、referral fee、prep service、return processing fee 等需要更多业务参数的费用。" }
+        ]
+      });
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      calculate();
+    });
+
+    exampleBtn.addEventListener("click", () => {
+      document.getElementById("length").value = "58";
+      document.getElementById("width").value = "40";
+      document.getElementById("height").value = "30";
+      document.getElementById("weight").value = "1.25";
+      document.getElementById("price").value = "";
+      document.getElementById("dos30").value = "12";
+      document.getElementById("dos90").value = "18";
+      originSelect.value = "DE";
+      destinationSelect.value = "FR";
+      document.getElementById("pan-eu").checked = true;
+      document.getElementById("selected-category").checked = false;
+      document.getElementById("low-price-special").checked = false;
+      document.getElementById("use-low-price").checked = true;
+      document.getElementById("cep-enrolled").checked = true;
+      document.getElementById("hazmat").checked = false;
+      document.getElementById("sipp").checked = false;
+      document.getElementById("fuel-logistics-surcharge").checked = true;
+      calculate();
+    });
+
+    populateCountries();
+  </script>
+</body>
+</html>
