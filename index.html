@@ -9,9 +9,12 @@
 </head>
 <body data-route="home">
   <main class="site-shell">
-    <nav class="site-nav">
+    <nav class="site-nav" data-nav-shell>
       <a class="brand" href="/">Marketplace Fee Studio</a>
-      <div class="nav-links">
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav-links">
+        Menu
+      </button>
+      <div class="nav-links" id="site-nav-links" data-nav-links>
         <a href="/na/">NA</a>
         <a href="/eu-uk/">EU & UK</a>
         <a href="/walmart/">Walmart</a>

@@ -4,6 +4,33 @@ async function loadVersionData() {
   return response.json();
 }
 
+function setSiteNavOpen(nav, toggle, open) {
+  if (!nav || !toggle) return;
+  nav.dataset.navOpen = open ? "true" : "false";
+  toggle.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function initSiteNav() {
+  const nav = document.querySelector("[data-nav-shell]");
+  const toggle = document.querySelector("[data-nav-toggle]");
+  const links = document.querySelector("[data-nav-links]");
+
+  if (!nav || !toggle || !links) return;
+
+  setSiteNavOpen(nav, toggle, false);
+
+  toggle.addEventListener("click", () => {
+    const isOpen = toggle.getAttribute("aria-expanded") === "true";
+    setSiteNavOpen(nav, toggle, !isOpen);
+  });
+
+  links.addEventListener("click", (event) => {
+    if (event.target?.closest?.("a")) {
+      setSiteNavOpen(nav, toggle, false);
+    }
+  });
+}
+
 function showHydrationFallback(error) {
   document.body.dataset.siteHydration = "fallback";
 
@@ -87,19 +114,27 @@ async function hydrateSite() {
   }
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", hydrateSite, { once: true });
-} else {
+function bootSite() {
+  initSiteNav();
   hydrateSite();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootSite, { once: true });
+} else {
+  bootSite();
 }
 
 window.FeeStudioSite = {
   loadVersionData,
+  initSiteNav,
+  setSiteNavOpen,
   hydrateSite,
   hydrateVersionCards,
   hydrateHomepageUpdates,
   hydrateChangelog,
   renderUpdateList,
   createUpdateCard,
-  showHydrationFallback
+  showHydrationFallback,
+  bootSite
 };

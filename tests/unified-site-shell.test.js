@@ -55,7 +55,9 @@ test("homepage keeps the stacked tool grid contract", () => {
   const css = fs.readFileSync(path.join(root, "assets", "site.css"), "utf8");
   assert.match(homepage, /class="tool-grid"/);
   assert.match(css, /@media \(max-width: 960px\)[\s\S]*\.tool-grid \{\s*grid-template-columns: 1fr;/);
-  assert.match(css, /@media \(max-width: 720px\)[\s\S]*\.nav-links \{\s*gap: 12px;[\s\S]*flex-wrap: wrap;/);
+  assert.match(homepage, /class="nav-toggle"/);
+  assert.match(css, /@media \(max-width: 720px\)[\s\S]*\.nav-toggle \{ display: inline-flex; \}/);
+  assert.match(css, /@media \(max-width: 720px\)[\s\S]*\.site-nav\[data-nav-open="true"\] \.nav-links \{ display: flex; \}/);
   assert.match(css, /@media \(max-width: 720px\)[\s\S]*\.tool-embed \{\s*min-height: 1320px;[\s\S]*height: 1320px;/);
   assert.match(css, /@media \(max-width: 720px\)[\s\S]*\.site-shell \{\s*padding: 16px;/);
 });
