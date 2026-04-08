@@ -633,21 +633,21 @@
           <div class="triple">
             <div class="field">
               <label for="length">长</label>
-              <input id="length" name="length" type="number" min="0.01" step="0.01" value="13" required />
+              <input id="length" name="length" type="number" min="0.01" step="0.001" value="13" required />
             </div>
             <div class="field">
               <label for="width">宽</label>
-              <input id="width" name="width" type="number" min="0.01" step="0.01" value="9" required />
+              <input id="width" name="width" type="number" min="0.01" step="0.001" value="9" required />
             </div>
             <div class="field">
               <label for="height">高</label>
-              <input id="height" name="height" type="number" min="0.01" step="0.01" value="0.85" required />
+              <input id="height" name="height" type="number" min="0.01" step="0.001" value="0.85" required />
             </div>
           </div>
 
           <div class="field">
             <label for="weight">包装重量</label>
-            <input id="weight" name="weight" type="number" min="0.01" step="0.01" value="5.4" required />
+            <input id="weight" name="weight" type="number" min="0.01" step="0.001" value="5.4" required />
           </div>
 
           <div class="toggle-list">
@@ -656,6 +656,14 @@
               <div>
                 <strong>Fuel & logistics surcharge</strong>
                 <span>默认按 2026-04-17 起的临时规则预估。US / CA 会对基础 fulfilment fee 加收 3.5%，MX 当前不适用。</span>
+              </div>
+            </label>
+
+            <label class="toggle">
+              <input id="largeStandardDimMinimum" name="largeStandardDimMinimum" type="checkbox" />
+              <div>
+                <strong>Large standard-size 次长边 / 最短边按至少 2 inch 计算</strong>
+                <span>仅当 US 结果属于 Large standard-size 时生效。若勾选，会把中间边与最短边都按至少 2 inch 参与 dimensional weight 计算。</span>
               </div>
             </label>
 

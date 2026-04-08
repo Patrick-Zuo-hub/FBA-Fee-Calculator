@@ -102,6 +102,7 @@ test("NA sample includes surcharge by default and removes it when unchecked", ()
     { id: "weight", name: "weight" },
     { id: "price", name: "price" },
     { id: "fuelLogisticsSurcharge", name: "fuelLogisticsSurcharge" },
+    { id: "largeStandardDimMinimum", name: "largeStandardDimMinimum" },
     { id: "sippCertified", name: "sippCertified" },
     { id: "longTermDos", name: "longTermDos" },
     { id: "shortTermDos", name: "shortTermDos" },

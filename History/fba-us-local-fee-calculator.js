@@ -623,6 +623,7 @@
       unitWeightLb: toPounds(weight, weightUnit),
       unitWeightKg: toKilograms(weight, weightUnit),
       fuelLogisticsSurcharge: fd.get("fuelLogisticsSurcharge") === "on",
+      largeStandardDimMinimum: fd.get("largeStandardDimMinimum") === "on",
       sippCertified: fd.get("sippCertified") === "on",
       longTermDos: fd.get("longTermDos") ? Number(fd.get("longTermDos")) : null,
       shortTermDos: fd.get("shortTermDos") ? Number(fd.get("shortTermDos")) : null,
@@ -647,12 +648,19 @@
     return (dimsIn[0] * Math.max(dimsIn[1], 2) * Math.max(dimsIn[2], 2)) / 139;
   }
 
+  function dimensionalWeightUsActual(dimsIn) {
+    return (dimsIn[0] * dimsIn[1] * dimsIn[2]) / 139;
+  }
+
   function dimensionalWeightMetric(dimsCm) {
     return (dimsCm[0] * dimsCm[1] * dimsCm[2]) / 5000;
   }
 
   function classifyUs(input) {
     const dims = sortedDims(input.lengthIn, input.widthIn, input.heightIn);
+    const dimWeightLargeStandardLb = input.largeStandardDimMinimum
+      ? dimensionalWeightUs(dims)
+      : dimensionalWeightUsActual(dims);
     const dimWeightLb = dimensionalWeightUs(dims);
     const smallStandardUnitOz = input.unitWeightLb * 16;
     const lpg = lengthPlusGirth(dims);
@@ -668,7 +676,28 @@
         feeShippingWeight: input.unitWeightLb,
         weightUnit: "lb",
         shippingWeightBasis: "unit weight",
-        dimWeight: dimWeightLb,
+        dimWeight: dimWeightLargeStandardLb,
+        dimWeightUnit: "lb",
+        lengthPlusGirth: lpg,
+        overmax: false,
+        warnings: []
+      };
+    }
+
+    const largeStandardShippingWeightLb = Math.max(input.unitWeightLb, dimWeightLargeStandardLb);
+
+    if (largeStandardShippingWeightLb <= 20 && dims[0] <= 18 && dims[1] <= 14 && dims[2] <= 8) {
+      return {
+        market: "US",
+        key: "large_standard",
+        label: "Large standard-size",
+        dims,
+        dimensionUnit: "in",
+        rawShippingWeight: largeStandardShippingWeightLb,
+        feeShippingWeight: largeStandardShippingWeightLb,
+        weightUnit: "lb",
+        shippingWeightBasis: dimWeightLargeStandardLb > input.unitWeightLb ? "dimensional weight" : "unit weight",
+        dimWeight: dimWeightLargeStandardLb,
         dimWeightUnit: "lb",
         lengthPlusGirth: lpg,
         overmax: false,
@@ -677,25 +706,6 @@
     }
 
     const shippingWeightLb = Math.max(input.unitWeightLb, dimWeightLb);
-
-    if (shippingWeightLb <= 20 && dims[0] <= 18 && dims[1] <= 14 && dims[2] <= 8) {
-      return {
-        market: "US",
-        key: "large_standard",
-        label: "Large standard-size",
-        dims,
-        dimensionUnit: "in",
-        rawShippingWeight: shippingWeightLb,
-        feeShippingWeight: shippingWeightLb,
-        weightUnit: "lb",
-        shippingWeightBasis: dimWeightLb > input.unitWeightLb ? "dimensional weight" : "unit weight",
-        dimWeight: dimWeightLb,
-        dimWeightUnit: "lb",
-        lengthPlusGirth: lpg,
-        overmax: false,
-        warnings: []
-      };
-    }
 
     if (shippingWeightLb <= 50 && dims[0] <= 37 && dims[1] <= 28 && dims[2] <= 20 && lpg <= 130) {
       return {
@@ -1676,6 +1686,7 @@
         dom.price.value = "8.99";
         dom.category.value = "non_apparel";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = true;
         dom.longTermDos.value = "12";
         dom.shortTermDos.value = "18";
@@ -1689,6 +1700,7 @@
         dom.price.value = "79";
         dom.category.value = "non_apparel";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = false;
         dom.longTermDos.value = "";
         dom.shortTermDos.value = "";
@@ -1706,6 +1718,7 @@
         dom.weight.value = "0.222";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = true;
       } else {
         dom.length.value = "152.4";
@@ -1714,6 +1727,7 @@
         dom.weight.value = "44.23";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = false;
       }
     } else {
@@ -1729,6 +1743,7 @@
         dom.price.value = "499";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = true;
       } else {
         dom.length.value = "152.4";
@@ -1738,6 +1753,7 @@
         dom.price.value = "13900";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = false;
       }
     }
@@ -1771,6 +1787,7 @@
     dom.weight = document.getElementById("weight");
     dom.price = document.getElementById("price");
     dom.fuelLogisticsSurcharge = document.getElementById("fuelLogisticsSurcharge");
+    dom.largeStandardDimMinimum = document.getElementById("largeStandardDimMinimum");
     dom.sippCertified = document.getElementById("sippCertified");
     dom.longTermDos = document.getElementById("longTermDos");
     dom.shortTermDos = document.getElementById("shortTermDos");
