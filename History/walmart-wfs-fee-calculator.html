@@ -405,6 +405,151 @@
       gap: 16px;
     }
 
+    .profit-estimator {
+      display: grid;
+      gap: 18px;
+    }
+
+    .profit-estimator__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .profit-estimator__header p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 60ch;
+    }
+
+    .profit-estimator__meta {
+      min-width: 132px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(27, 56, 32, 0.08);
+      text-align: right;
+    }
+
+    .profit-estimator__meta span,
+    .profit-estimator__meta em {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-style: normal;
+    }
+
+    .profit-estimator__meta strong {
+      display: block;
+      margin: 6px 0 4px;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .profit-estimator__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+      gap: 16px;
+    }
+
+    .profit-estimator__fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .profit-field {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(27, 56, 32, 0.08);
+    }
+
+    .profit-field span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .profit-field input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .profit-field input:focus {
+      border-color: rgba(0, 116, 53, 0.42);
+      box-shadow: 0 0 0 4px rgba(0, 116, 53, 0.12);
+    }
+
+    .profit-estimator__side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .profit-result-card {
+      padding: 22px;
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(0, 116, 53, 0.94), rgba(13, 141, 104, 0.9)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+      color: #fff;
+      box-shadow: 0 20px 40px rgba(0, 116, 53, 0.18);
+    }
+
+    .profit-result-card__label,
+    .profit-result-card__hint,
+    .profit-result-card__message {
+      display: block;
+    }
+
+    .profit-result-card__label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.82;
+    }
+
+    .profit-result-card__value {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(36px, 4vw, 56px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .profit-result-card__hint {
+      margin-top: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.84);
+    }
+
+    .profit-result-card__message {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .profit-estimator__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
     .card {
       padding: 20px;
     }
@@ -498,6 +643,10 @@
         grid-template-columns: 1fr;
       }
 
+      .profit-estimator__layout {
+        grid-template-columns: 1fr;
+      }
+
       .hero-side {
         border-left: 0;
         border-top: 1px solid rgba(27, 56, 32, 0.08);
@@ -522,8 +671,18 @@
       .summary-grid,
       .mini-grid,
       .facts,
-      .guide-grid {
+      .guide-grid,
+      .profit-estimator__fields {
         grid-template-columns: 1fr;
+      }
+
+      .profit-estimator__header {
+        flex-direction: column;
+      }
+
+      .profit-estimator__meta {
+        width: 100%;
+        text-align: left;
       }
 
       h1 {
@@ -531,6 +690,7 @@
       }
     }
   </style>
+  <script defer src="./profit-estimator.js"></script>
   <script defer src="./walmart-wfs-fee-calculator.js"></script>
 </head>
 <body>

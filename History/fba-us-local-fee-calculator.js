@@ -1,5 +1,6 @@
 (function () {
   const surchargeRules = globalThis.FBA_SURCHARGE_RULES || {};
+  const profitEstimator = globalThis.PROFIT_ESTIMATOR || {};
   const DATA = {
     markets: {
       US: {
@@ -1438,6 +1439,144 @@
     return `${view.marketLabel} · ${view.categoryLabel} · ${view.priceBandLabel}`;
   }
 
+  function createProfitState(market) {
+    if (typeof profitEstimator.createProfitState === "function") {
+      return profitEstimator.createProfitState({ market }, dom.profitState);
+    }
+
+    return {
+      market,
+      grossSellingPrice: "",
+      vat: 0,
+      referralRate: 15,
+      fbaFee: "",
+      chargeableWeightKg: "",
+      firstLegPriceRmbPerKg: 8,
+      productCostRmb: "",
+      exchangeRate: market === "CA" ? 5 : market === "MX" ? 0.4 : 7
+    };
+  }
+
+  function ensureProfitState(market) {
+    dom.profitState = createProfitState(market);
+    return dom.profitState;
+  }
+
+  function readProfitStateFromDom(market) {
+    const nextState = ensureProfitState(market);
+    const fieldMap = {
+      grossSellingPrice: "profitGrossSellingPrice",
+      vat: "profitVat",
+      referralRate: "profitReferralRate",
+      fbaFee: "profitFbaFee",
+      chargeableWeightKg: "profitChargeableWeightKg",
+      firstLegPriceRmbPerKg: "profitFirstLegPriceRmbPerKg",
+      productCostRmb: "profitProductCostRmb",
+      exchangeRate: "profitExchangeRate"
+    };
+
+    Object.entries(fieldMap).forEach(([key, id]) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+      nextState[key] = element.value.trim() === "" ? "" : element.value.trim();
+    });
+
+    dom.profitState = nextState;
+    return nextState;
+  }
+
+  function buildProfitSyncSource() {
+    const input = collectInput();
+    const dimsReady = [input.lengthCm, input.widthCm, input.heightCm, input.unitWeightKg]
+      .every((value) => Number.isFinite(value) && value > 0);
+
+    return {
+      market: input.market,
+      fbaFee: dom.lastResultView && Number.isFinite(dom.lastResultView.total) ? dom.lastResultView.total : null,
+      lengthCm: dimsReady ? input.lengthCm : null,
+      widthCm: dimsReady ? input.widthCm : null,
+      heightCm: dimsReady ? input.heightCm : null,
+      actualWeightKg: dimsReady ? input.unitWeightKg : null
+    };
+  }
+
+  function renderProfitEstimatorSection(market) {
+    ensureProfitState(market);
+
+    if (typeof profitEstimator.renderEstimatorPanel !== "function") {
+      return "";
+    }
+
+    return profitEstimator.renderEstimatorPanel({
+      market,
+      marketLabel: DATA.markets[market].short,
+      currency: DATA.markets[market].currency,
+      state: dom.profitState,
+      result: dom.profitResult
+    });
+  }
+
+  function bindProfitEstimator(market) {
+    const syncButton = document.getElementById("profitSyncButton");
+    const calculateButton = document.getElementById("profitCalculateButton");
+    if (!syncButton || !calculateButton) return;
+
+    [
+      "profitGrossSellingPrice",
+      "profitVat",
+      "profitReferralRate",
+      "profitFbaFee",
+      "profitChargeableWeightKg",
+      "profitFirstLegPriceRmbPerKg",
+      "profitProductCostRmb",
+      "profitExchangeRate"
+    ].forEach((id) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+      element.addEventListener("input", () => {
+        readProfitStateFromDom(market);
+      });
+      element.addEventListener("change", () => {
+        readProfitStateFromDom(market);
+      });
+    });
+
+    syncButton.addEventListener("click", () => {
+      const currentState = readProfitStateFromDom(market);
+      dom.profitState = typeof profitEstimator.syncEstimatorFields === "function"
+        ? profitEstimator.syncEstimatorFields(currentState, buildProfitSyncSource())
+        : currentState;
+      dom.profitResult = null;
+      refreshResultView();
+    });
+
+    calculateButton.addEventListener("click", () => {
+      const currentState = readProfitStateFromDom(market);
+      dom.profitResult = typeof profitEstimator.calculateGrossMargin === "function"
+        ? profitEstimator.calculateGrossMargin(currentState)
+        : null;
+      refreshResultView();
+    });
+  }
+
+  function renderEmptyState(message) {
+    const market = dom.market ? dom.market.value : "US";
+    ensureProfitState(market);
+    dom.result.innerHTML = `
+      <div class="empty-state">${message}</div>
+      ${renderProfitEstimatorSection(market)}
+    `;
+    bindProfitEstimator(market);
+  }
+
+  function refreshResultView() {
+    if (dom.lastResultView) {
+      renderResult(dom.lastResultView);
+      return;
+    }
+    renderEmptyState(`先选择站点，再输入尺寸、重量、售价和费率类别，然后点击“计算北美 FBA 费用”。`);
+  }
+
   function renderResult(view) {
     const breakdown = [];
 
@@ -1533,6 +1672,8 @@
         </div>
       </div>
 
+      ${renderProfitEstimatorSection(view.market)}
+
       <div class="detail-grid">
         <section class="card">
           <h3>核心结果</h3>
@@ -1565,12 +1706,15 @@
         </div>
       </section>
     `;
+    bindProfitEstimator(view.market);
   }
 
   function calculate() {
     const input = collectInput();
     if (!validateInput(input)) {
-      dom.result.innerHTML = `<div class="empty-state">请先输入合法的尺寸、重量${DATA.markets[input.market].priceRequired ? "、售价" : ""}和站点信息。</div>`;
+      dom.lastResultView = null;
+      dom.profitResult = null;
+      renderEmptyState(`请先输入合法的尺寸、重量${DATA.markets[input.market].priceRequired ? "、售价" : ""}和站点信息。`);
       return;
     }
 
@@ -1593,7 +1737,7 @@
       );
     }
 
-    renderResult({
+    dom.lastResultView = {
       market: input.market,
       marketLabel: DATA.markets[input.market].short,
       tier,
@@ -1620,7 +1764,8 @@
       priceBandLabel: priceBandLabel(input),
       categoryLabel: DATA.categories[input.market][input.category].short,
       warnings: tier.warnings
-    });
+    };
+    renderResult(dom.lastResultView);
   }
 
   function populateCategoryOptions(market) {
@@ -1800,6 +1945,7 @@
     dom.resultIntro = document.getElementById("result-intro");
 
     syncMarketUi();
+    renderEmptyState(`先选择站点，再输入尺寸、重量、售价和费率类别，然后点击“计算北美 FBA 费用”。`);
 
     dom.market.addEventListener("change", () => {
       syncMarketUi();

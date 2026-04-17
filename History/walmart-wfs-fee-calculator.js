@@ -1,4 +1,5 @@
 (function () {
+  const profitEstimator = globalThis.PROFIT_ESTIMATOR || {};
   const DATA = {
     currency: "USD",
     storageRates: {
@@ -372,6 +373,139 @@
     `).join("");
   }
 
+  function createProfitState() {
+    if (typeof profitEstimator.createProfitState === "function") {
+      return profitEstimator.createProfitState({ market: "Walmart" }, dom.profitState);
+    }
+
+    return {
+      market: "Walmart",
+      grossSellingPrice: "",
+      vat: 0,
+      referralRate: 15,
+      fbaFee: "",
+      chargeableWeightKg: "",
+      firstLegPriceRmbPerKg: 8,
+      productCostRmb: "",
+      exchangeRate: 7
+    };
+  }
+
+  function ensureProfitState() {
+    dom.profitState = createProfitState();
+    return dom.profitState;
+  }
+
+  function readProfitStateFromDom() {
+    const nextState = ensureProfitState();
+    const fieldMap = {
+      grossSellingPrice: "profitGrossSellingPrice",
+      vat: "profitVat",
+      referralRate: "profitReferralRate",
+      fbaFee: "profitFbaFee",
+      chargeableWeightKg: "profitChargeableWeightKg",
+      firstLegPriceRmbPerKg: "profitFirstLegPriceRmbPerKg",
+      productCostRmb: "profitProductCostRmb",
+      exchangeRate: "profitExchangeRate"
+    };
+
+    Object.entries(fieldMap).forEach(([key, id]) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+      nextState[key] = element.value.trim() === "" ? "" : element.value.trim();
+    });
+
+    dom.profitState = nextState;
+    return nextState;
+  }
+
+  function buildProfitSyncSource() {
+    const input = collectInput();
+    const dimsReady = [input.lengthIn, input.widthIn, input.heightIn, input.unitWeightLb]
+      .every((value) => Number.isFinite(value) && value > 0);
+
+    return {
+      market: "Walmart",
+      fbaFee: dom.lastResultView ? dom.lastResultView.fulfillment.total : null,
+      lengthCm: dimsReady ? input.lengthIn * 2.54 : null,
+      widthCm: dimsReady ? input.widthIn * 2.54 : null,
+      heightCm: dimsReady ? input.heightIn * 2.54 : null,
+      actualWeightKg: dimsReady ? input.unitWeightLb * 0.45359237 : null
+    };
+  }
+
+  function renderProfitEstimatorSection() {
+    ensureProfitState();
+
+    if (typeof profitEstimator.renderEstimatorPanel !== "function") {
+      return "";
+    }
+
+    return profitEstimator.renderEstimatorPanel({
+      market: "Walmart",
+      marketLabel: "Walmart US",
+      currency: "USD",
+      state: dom.profitState,
+      result: dom.profitResult
+    });
+  }
+
+  function bindProfitEstimator() {
+    const syncButton = document.getElementById("profitSyncButton");
+    const calculateButton = document.getElementById("profitCalculateButton");
+    if (!syncButton || !calculateButton) return;
+
+    [
+      "profitGrossSellingPrice",
+      "profitVat",
+      "profitReferralRate",
+      "profitFbaFee",
+      "profitChargeableWeightKg",
+      "profitFirstLegPriceRmbPerKg",
+      "profitProductCostRmb",
+      "profitExchangeRate"
+    ].forEach((id) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+      element.addEventListener("input", () => readProfitStateFromDom());
+      element.addEventListener("change", () => readProfitStateFromDom());
+    });
+
+    syncButton.addEventListener("click", () => {
+      const currentState = readProfitStateFromDom();
+      dom.profitState = typeof profitEstimator.syncEstimatorFields === "function"
+        ? profitEstimator.syncEstimatorFields(currentState, buildProfitSyncSource())
+        : currentState;
+      dom.profitResult = null;
+      refreshResultView();
+    });
+
+    calculateButton.addEventListener("click", () => {
+      const currentState = readProfitStateFromDom();
+      dom.profitResult = typeof profitEstimator.calculateGrossMargin === "function"
+        ? profitEstimator.calculateGrossMargin(currentState)
+        : null;
+      refreshResultView();
+    });
+  }
+
+  function renderEmptyState(message) {
+    ensureProfitState();
+    dom.result.innerHTML = `
+      <div class="empty-state">${message}</div>
+      ${renderProfitEstimatorSection()}
+    `;
+    bindProfitEstimator();
+  }
+
+  function refreshResultView() {
+    if (dom.lastResultView) {
+      renderResult(dom.lastResultView);
+      return;
+    }
+    renderEmptyState("先输入尺寸、重量和售价，然后点击“计算 WFS 费用”。");
+  }
+
   function renderResult(view) {
     dom.result.innerHTML = `
       <div class="summary-grid">
@@ -391,6 +525,8 @@
           <p>${view.input.quantity} unit${view.input.quantity === 1 ? "" : "s"} · ${view.storage.rate.label}</p>
         </div>
       </div>
+
+      ${renderProfitEstimatorSection()}
 
       <div class="detail-grid">
         <section class="card">
@@ -495,12 +631,15 @@
         </div>
       </section>
     `;
+    bindProfitEstimator();
   }
 
   function calculate() {
     const input = collectInput();
     if (!validateInput(input)) {
-      dom.result.innerHTML = `<div class="empty-state">请先输入合法的尺寸、重量、售价和数量。</div>`;
+      dom.lastResultView = null;
+      dom.profitResult = null;
+      renderEmptyState("请先输入合法的尺寸、重量、售价和数量。");
       return;
     }
 
@@ -511,7 +650,7 @@
     const prep = calculatePrep(input);
     const disposal = calculateDisposalRemoval(input);
 
-    renderResult({
+    dom.lastResultView = {
       input,
       classification,
       fulfillment,
@@ -519,7 +658,8 @@
       storage,
       prep,
       disposal
-    });
+    };
+    renderResult(dom.lastResultView);
   }
 
   function loadExample(type) {
@@ -573,6 +713,7 @@
     dom.isHazmat = document.getElementById("isHazmat");
     dom.missingLabel = document.getElementById("missingLabel");
     dom.missingPolybag = document.getElementById("missingPolybag");
+    renderEmptyState("先输入尺寸、重量和售价，然后点击“计算 WFS 费用”。");
 
     dom.form.addEventListener("submit", (event) => {
       event.preventDefault();

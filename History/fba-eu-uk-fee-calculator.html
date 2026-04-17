@@ -6,6 +6,7 @@
   <title>Amazon EU & UK FBA Fee Calculator</title>
   <script src="./fba-fee-data.js"></script>
   <script src="./fba-surcharge-rules.js"></script>
+  <script src="./profit-estimator.js"></script>
   <style>
     :root {
       --bg: #f5efe7;
@@ -365,6 +366,157 @@
       gap: 12px;
     }
 
+    .profit-estimator {
+      margin-top: 18px;
+      display: grid;
+      gap: 18px;
+      padding: 20px;
+      border-radius: 24px;
+      background: rgba(255, 250, 245, 0.88);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .profit-estimator__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .profit-estimator__header p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 60ch;
+    }
+
+    .profit-estimator__meta {
+      min-width: 132px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 253, 250, 0.82);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+      text-align: right;
+    }
+
+    .profit-estimator__meta span,
+    .profit-estimator__meta em {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-style: normal;
+    }
+
+    .profit-estimator__meta strong {
+      display: block;
+      margin: 6px 0 4px;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .profit-estimator__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+      gap: 16px;
+    }
+
+    .profit-estimator__fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .profit-field {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 253, 250, 0.82);
+      border: 1px solid rgba(63, 46, 32, 0.08);
+    }
+
+    .profit-field span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .profit-field input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .profit-field input:focus {
+      border-color: rgba(182, 90, 52, 0.5);
+      box-shadow: 0 0 0 4px rgba(182, 90, 52, 0.12);
+    }
+
+    .profit-estimator__side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .profit-result-card {
+      padding: 22px;
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(182, 90, 52, 0.94), rgba(211, 134, 91, 0.9)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+      color: #fff;
+      box-shadow: 0 20px 40px rgba(182, 90, 52, 0.16);
+    }
+
+    .profit-result-card__label,
+    .profit-result-card__hint,
+    .profit-result-card__message {
+      display: block;
+    }
+
+    .profit-result-card__label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.82;
+    }
+
+    .profit-result-card__value {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(36px, 4vw, 56px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .profit-result-card__hint {
+      margin-top: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.84);
+    }
+
+    .profit-result-card__message {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .profit-estimator__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
     .section h3 {
       margin: 0;
       font-size: 18px;
@@ -456,6 +608,10 @@
         border-left: 0;
         border-top: 1px solid rgba(63, 46, 32, 0.08);
       }
+
+      .profit-estimator__layout {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 720px) {
@@ -472,8 +628,18 @@
       .triple,
       .double,
       .summary-grid,
-      .stat-grid {
+      .stat-grid,
+      .profit-estimator__fields {
         grid-template-columns: 1fr;
+      }
+
+      .profit-estimator__header {
+        flex-direction: column;
+      }
+
+      .profit-estimator__meta {
+        width: 100%;
+        text-align: left;
       }
 
       h1 {
@@ -675,6 +841,7 @@
   <script>
     const data = window.FBA_FEE_DATA;
     const surchargeRules = window.FBA_SURCHARGE_RULES || {};
+    const profitEstimator = window.PROFIT_ESTIMATOR || {};
     const countryOrder = ["UK", "DE", "FR", "IT", "ES", "NL", "SE", "PL", "BE", "IE"];
 
     const form = document.getElementById("fee-form");
@@ -684,6 +851,148 @@
     const originSelect = document.getElementById("origin");
     const destinationSelect = document.getElementById("destination");
     const exampleBtn = document.getElementById("example-btn");
+
+    function profitMarketFromCurrency(currency) {
+      return currency === "GBP" ? "UK" : "EU";
+    }
+
+    function currentProfitMarket() {
+      const destination = data.COUNTRIES[destinationSelect.value];
+      return destination && destination.currency === "GBP" ? "UK" : "EU";
+    }
+
+    function createProfitState(market) {
+      if (typeof profitEstimator.createProfitState === "function") {
+        return profitEstimator.createProfitState({ market }, window.__profitState);
+      }
+      return {
+        market,
+        grossSellingPrice: "",
+        vat: 20,
+        referralRate: 15,
+        fbaFee: "",
+        chargeableWeightKg: "",
+        firstLegPriceRmbPerKg: 8,
+        productCostRmb: "",
+        exchangeRate: market === "UK" ? 9 : 7.8
+      };
+    }
+
+    function ensureProfitState(market) {
+      window.__profitState = createProfitState(market);
+      return window.__profitState;
+    }
+
+    function readProfitStateFromDom(market) {
+      const nextState = ensureProfitState(market);
+      const fieldMap = {
+        grossSellingPrice: "profitGrossSellingPrice",
+        vat: "profitVat",
+        referralRate: "profitReferralRate",
+        fbaFee: "profitFbaFee",
+        chargeableWeightKg: "profitChargeableWeightKg",
+        firstLegPriceRmbPerKg: "profitFirstLegPriceRmbPerKg",
+        productCostRmb: "profitProductCostRmb",
+        exchangeRate: "profitExchangeRate"
+      };
+
+      Object.entries(fieldMap).forEach(([key, id]) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        nextState[key] = element.value.trim() === "" ? "" : element.value.trim();
+      });
+
+      window.__profitState = nextState;
+      return nextState;
+    }
+
+    function buildProfitSyncSource() {
+      const input = getInput();
+      const route = determineRoute(input);
+      const market = route.mode === "unsupported"
+        ? currentProfitMarket()
+        : profitMarketFromCurrency(route.currency);
+
+      return {
+        market,
+        fbaFee: window.__lastResultView ? window.__lastResultView.primaryTotal : null,
+        lengthCm: Number.isFinite(input.length) && input.length > 0 ? input.length : null,
+        widthCm: Number.isFinite(input.width) && input.width > 0 ? input.width : null,
+        heightCm: Number.isFinite(input.height) && input.height > 0 ? input.height : null,
+        actualWeightKg: Number.isFinite(input.weightKg) && input.weightKg > 0 ? input.weightKg : null
+      };
+    }
+
+    function renderProfitEstimatorSection(market, currency, marketLabel) {
+      ensureProfitState(market);
+      if (typeof profitEstimator.renderEstimatorPanel !== "function") return "";
+      return profitEstimator.renderEstimatorPanel({
+        market,
+        currency,
+        marketLabel,
+        state: window.__profitState,
+        result: window.__profitResult
+      });
+    }
+
+    function bindProfitEstimator(market) {
+      const syncButton = document.getElementById("profitSyncButton");
+      const calculateButton = document.getElementById("profitCalculateButton");
+      if (!syncButton || !calculateButton) return;
+
+      [
+        "profitGrossSellingPrice",
+        "profitVat",
+        "profitReferralRate",
+        "profitFbaFee",
+        "profitChargeableWeightKg",
+        "profitFirstLegPriceRmbPerKg",
+        "profitProductCostRmb",
+        "profitExchangeRate"
+      ].forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", () => readProfitStateFromDom(market));
+        element.addEventListener("change", () => readProfitStateFromDom(market));
+      });
+
+      syncButton.addEventListener("click", () => {
+        const currentState = readProfitStateFromDom(market);
+        window.__profitState = typeof profitEstimator.syncEstimatorFields === "function"
+          ? profitEstimator.syncEstimatorFields(currentState, buildProfitSyncSource())
+          : currentState;
+        window.__profitResult = null;
+        refreshProfitView();
+      });
+
+      calculateButton.addEventListener("click", () => {
+        const currentState = readProfitStateFromDom(market);
+        window.__profitResult = typeof profitEstimator.calculateGrossMargin === "function"
+          ? profitEstimator.calculateGrossMargin(currentState)
+          : null;
+        refreshProfitView();
+      });
+    }
+
+    function renderEmptyState(message) {
+      const market = currentProfitMarket();
+      const currency = market === "UK" ? "GBP" : "EUR";
+      const marketLabel = market === "UK" ? "英国站" : "欧盟站";
+      resultRoot.className = "";
+      resultRoot.innerHTML = `
+        <div class="empty">${message}</div>
+        ${renderProfitEstimatorSection(market, currency, marketLabel)}
+      `;
+      bindProfitEstimator(market);
+    }
+
+    function refreshProfitView() {
+      if (window.__lastResultView) {
+        renderResults(window.__lastResultView);
+        return;
+      }
+      renderEmptyState("请先输入合法的尺寸和重量。");
+    }
 
     function populateCountries() {
       countryOrder.forEach((code) => {
@@ -1474,6 +1783,8 @@
           </div>
         </div>
 
+        ${renderProfitEstimatorSection(view.profitMarket, view.currency, view.profitMarketLabel)}
+
         <div class="section">
           <h3>费率拆解</h3>
           <div class="breakdown">
@@ -1503,22 +1814,29 @@
           </div>
         </div>
       `;
+      bindProfitEstimator(view.profitMarket);
     }
 
     function calculate() {
       const input = getInput();
       const dimsValid = [input.length, input.width, input.height, input.weightKg].every((value) => Number.isFinite(value) && value > 0);
       if (!dimsValid) {
-        resultRoot.className = "empty";
-        resultRoot.textContent = "请先输入合法的尺寸和重量。";
+        window.__lastResultView = null;
+        window.__profitResult = null;
+        renderEmptyState("请先输入合法的尺寸和重量。");
         routePill.hidden = true;
         return;
       }
 
       const route = determineRoute(input);
       if (route.mode === "unsupported") {
+        window.__lastResultView = null;
         resultRoot.className = "";
-        resultRoot.innerHTML = `<div class="note danger">${route.reason}</div>`;
+        resultRoot.innerHTML = `
+          <div class="note danger">${route.reason}</div>
+          ${renderProfitEstimatorSection(currentProfitMarket(), currentProfitMarket() === "UK" ? "GBP" : "EUR", currentProfitMarket() === "UK" ? "英国站" : "欧盟站")}
+        `;
+        bindProfitEstimator(currentProfitMarket());
         resultCaption.textContent = "当前路径没有找到公开费率。";
         routePill.hidden = true;
         return;
@@ -1527,8 +1845,13 @@
       const notes = [];
       const standardBase = computeStandardBase(input, route, notes);
       if (standardBase.error) {
+        window.__lastResultView = null;
         resultRoot.className = "";
-        resultRoot.innerHTML = `<div class="note danger">${standardBase.error}</div>`;
+        resultRoot.innerHTML = `
+          <div class="note danger">${standardBase.error}</div>
+          ${renderProfitEstimatorSection(profitMarketFromCurrency(route.currency), route.currency, route.currency === "GBP" ? "英国站" : "欧盟站")}
+        `;
+        bindProfitEstimator(profitMarketFromCurrency(route.currency));
         resultCaption.textContent = "基础费率无法自动匹配。";
         routePill.hidden = false;
         routePill.textContent = route.label;
@@ -1585,7 +1908,7 @@
       routePill.hidden = false;
       routePill.textContent = route.label;
 
-      renderResults({
+      window.__lastResultView = {
         currency: route.currency,
         primaryTotal: total,
         primaryLabel: usingLowPrice ? "已使用 low-price 作为主运费" : "已使用 standard / local / EFN / remote 作为主运费",
@@ -1599,12 +1922,15 @@
         fuelLogistics,
         altFee,
         breakdown,
+        profitMarket: profitMarketFromCurrency(route.currency),
+        profitMarketLabel: route.currency === "GBP" ? "英国站" : "欧盟站",
         notes: [
           ...notes,
           { type: "info", text: fuelLogistics.detail },
           { type: "info", text: "未自动计入 storage fee、aged inventory surcharge、referral fee、prep service、return processing fee 等需要更多业务参数的费用。" }
         ]
-      });
+      };
+      renderResults(window.__lastResultView);
     }
 
     form.addEventListener("submit", (event) => {
@@ -1634,6 +1960,7 @@
     });
 
     populateCountries();
+    renderEmptyState("请先输入合法的尺寸和重量。");
   </script>
 </body>
 </html>
