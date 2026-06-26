@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add a lightweight local history feature to each calculator page so users can continue from a recent successful FBA calculation after refreshing or reopening the page.
+Add a recent calculation history feature to each calculator page so users can continue from a recent successful FBA calculation after refreshing or reopening the page.
 
 The feature is intended to behave like a calculator-style local memory:
 - quick to save
