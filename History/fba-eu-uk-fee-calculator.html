@@ -7,6 +7,7 @@
   <script src="./fba-fee-data.js"></script>
   <script src="./fba-surcharge-rules.js"></script>
   <script src="./profit-estimator.js"></script>
+  <script src="./fba-history.js"></script>
   <style>
     :root {
       --bg: #f5efe7;
@@ -734,6 +735,16 @@
               </div>
             </div>
 
+            <div class="field">
+              <label for="history-note">本次记录备注（可选）</label>
+              <input id="history-note" type="text" maxlength="60" placeholder="例如：德国库存 / 法国销售" />
+            </div>
+
+            <div class="action-row">
+              <button type="submit" class="primary">计算 FBA 费用</button>
+              <button type="button" id="example-btn" class="ghost">载入一个 Pan-EU 示例</button>
+            </div>
+
             <div class="double">
               <div class="field">
                 <label for="dos30">30 天 Days of Supply（可选）</label>
@@ -811,10 +822,6 @@
               </label>
             </div>
 
-            <div class="action-row">
-              <button type="submit" class="primary">计算 FBA 费用</button>
-              <button type="button" id="example-btn" class="ghost">载入一个 Pan-EU 示例</button>
-            </div>
             <div class="tiny">
               页面按你提供的 PDF《Effective as of 1st February 2026》实现。未纳入本页总额的费用会单独提示，例如 storage、aged inventory、referral、prep、returns 等。
             </div>
@@ -842,6 +849,7 @@
     const data = window.FBA_FEE_DATA;
     const surchargeRules = window.FBA_SURCHARGE_RULES || {};
     const profitEstimator = window.PROFIT_ESTIMATOR || {};
+    const historyApi = window.FBA_HISTORY || {};
     const countryOrder = ["UK", "DE", "FR", "IT", "ES", "NL", "SE", "PL", "BE", "IE"];
 
     const form = document.getElementById("fee-form");
@@ -1817,7 +1825,34 @@
       bindProfitEstimator(view.profitMarket);
     }
 
-    function calculate() {
+    function historyInputs() {
+      return Array.from(form.elements)
+        .filter((element) => element.name)
+        .map((element) => ({
+          name: element.name,
+          type: element.type,
+          value: element.value,
+          checked: element.type === "checkbox" ? element.checked : undefined
+        }));
+    }
+
+    function restoreHistoryRecord(record) {
+      (record.inputs && record.inputs.fields || []).forEach((saved) => {
+        const element = form.elements.namedItem(saved.name);
+        if (!element) return;
+        if (saved.type === "checkbox") element.checked = Boolean(saved.checked);
+        else element.value = saved.value;
+      });
+      document.getElementById("history-note").value = record.note || "";
+      calculate();
+    }
+
+    const historyManager = typeof historyApi.createHistoryManager === "function"
+      ? historyApi.createHistoryManager({ storageKey: "fba-history-eu-uk", storage: window.localStorage })
+      : null;
+    let historyDrawer = null;
+
+    function calculate({ saveHistory = false } = {}) {
       const input = getInput();
       const dimsValid = [input.length, input.width, input.height, input.weightKg].every((value) => Number.isFinite(value) && value > 0);
       if (!dimsValid) {
@@ -1931,11 +1966,23 @@
         ]
       };
       renderResults(window.__lastResultView);
+      if (saveHistory && historyManager && typeof historyApi.createHistoryRecord === "function") {
+        historyManager.saveRecord(historyApi.createHistoryRecord({
+          note: document.getElementById("history-note").value.trim(),
+          inputs: { fields: historyInputs() },
+          resultSummary: {
+            totalFee: total,
+            totalFeeLabel: `${route.currency} ${total.toFixed(2)}`,
+            dimensionsLabel: `${input.length} × ${input.width} × ${input.height} cm`
+          }
+        }));
+        if (historyDrawer) historyDrawer.refresh();
+      }
     }
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      calculate();
+      calculate({ saveHistory: true });
     });
 
     exampleBtn.addEventListener("click", () => {
@@ -1961,6 +2008,12 @@
 
     populateCountries();
     renderEmptyState("请先输入合法的尺寸和重量。");
+    if (historyManager && typeof historyApi.mountHistoryDrawer === "function") {
+      historyDrawer = historyApi.mountHistoryDrawer({
+        manager: historyManager,
+        onRestore: restoreHistoryRecord
+      });
+    }
   </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 (function () {
   const profitEstimator = globalThis.PROFIT_ESTIMATOR || {};
+  const historyApi = globalThis.FBA_HISTORY || {};
   const DATA = {
     currency: "USD",
     storageRates: {
@@ -634,7 +635,53 @@
     bindProfitEstimator();
   }
 
-  function calculate() {
+  function buildHistoryRecord(input, view) {
+    if (typeof historyApi.createHistoryRecord !== "function") return null;
+    return historyApi.createHistoryRecord({
+      note: dom.historyNote.value.trim(),
+      inputs: {
+        retailPrice: String(input.retailPrice),
+        quantity: String(input.quantity),
+        dimensionUnit: input.dimensionUnit,
+        weightUnit: input.weightUnit,
+        length: String(input.lengthRaw),
+        width: String(input.widthRaw),
+        height: String(input.heightRaw),
+        weight: String(input.weightRaw),
+        storageWindow: input.storageWindow,
+        isApparel: input.isApparel,
+        isHazmat: input.isHazmat,
+        missingLabel: input.missingLabel,
+        missingPolybag: input.missingPolybag
+      },
+      resultSummary: {
+        totalFee: view.fulfillment.total,
+        totalFeeLabel: money(view.fulfillment.total),
+        dimensionsLabel: `${input.lengthRaw} × ${input.widthRaw} × ${input.heightRaw} ${input.dimensionUnit}`
+      }
+    });
+  }
+
+  function applyHistoryRecord(record) {
+    const input = record.inputs || {};
+    dom.retailPrice.value = input.retailPrice || "";
+    dom.quantity.value = input.quantity || "";
+    dom.dimensionUnit.value = input.dimensionUnit || "in";
+    dom.weightUnit.value = input.weightUnit || "lb";
+    dom.length.value = input.length || "";
+    dom.width.value = input.width || "";
+    dom.height.value = input.height || "";
+    dom.weight.value = input.weight || "";
+    dom.storageWindow.value = input.storageWindow || "jan_sep";
+    dom.isApparel.checked = Boolean(input.isApparel);
+    dom.isHazmat.checked = Boolean(input.isHazmat);
+    dom.missingLabel.checked = Boolean(input.missingLabel);
+    dom.missingPolybag.checked = Boolean(input.missingPolybag);
+    dom.historyNote.value = record.note || "";
+    calculate();
+  }
+
+  function calculate({ saveHistory = false } = {}) {
     const input = collectInput();
     if (!validateInput(input)) {
       dom.lastResultView = null;
@@ -660,6 +707,13 @@
       disposal
     };
     renderResult(dom.lastResultView);
+    if (saveHistory && dom.historyManager) {
+      const record = buildHistoryRecord(input, dom.lastResultView);
+      if (record) {
+        dom.historyManager.saveRecord(record);
+        if (dom.historyDrawer) dom.historyDrawer.refresh();
+      }
+    }
   }
 
   function loadExample(type) {
@@ -713,15 +767,28 @@
     dom.isHazmat = document.getElementById("isHazmat");
     dom.missingLabel = document.getElementById("missingLabel");
     dom.missingPolybag = document.getElementById("missingPolybag");
+    dom.historyNote = document.getElementById("historyNote");
+    if (typeof historyApi.createHistoryManager === "function") {
+      dom.historyManager = historyApi.createHistoryManager({
+        storageKey: "fba-history-walmart",
+        storage: globalThis.localStorage
+      });
+    }
     renderEmptyState("先输入尺寸、重量和售价，然后点击“计算 WFS 费用”。");
 
     dom.form.addEventListener("submit", (event) => {
       event.preventDefault();
-      calculate();
+      calculate({ saveHistory: true });
     });
 
     document.getElementById("sample-standard").addEventListener("click", () => loadExample("standard"));
     document.getElementById("sample-bulky").addEventListener("click", () => loadExample("bulky"));
+    if (dom.historyManager && typeof historyApi.mountHistoryDrawer === "function") {
+      dom.historyDrawer = historyApi.mountHistoryDrawer({
+        manager: dom.historyManager,
+        onRestore: applyHistoryRecord
+      });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", bindDom);

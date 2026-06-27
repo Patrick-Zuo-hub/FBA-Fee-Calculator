@@ -691,6 +691,7 @@
     }
   </style>
   <script defer src="./profit-estimator.js"></script>
+  <script defer src="./fba-history.js"></script>
   <script defer src="./walmart-wfs-fee-calculator.js"></script>
 </head>
 <body>
@@ -793,6 +794,17 @@
           </div>
 
           <div class="field">
+            <label for="historyNote">本次记录备注（可选）</label>
+            <input id="historyNote" type="text" maxlength="60" placeholder="例如：Walmart 标准件" />
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="primary">计算 WFS 费用</button>
+            <button type="button" id="sample-standard" class="secondary">载入标准件示例</button>
+            <button type="button" id="sample-bulky" class="secondary">载入大件示例</button>
+          </div>
+
+          <div class="field">
             <label for="storageWindow">Storage 计费窗口</label>
             <select id="storageWindow" name="storageWindow">
               <option value="jan_sep">January - September</option>
@@ -868,12 +880,6 @@
               </div>
             </div>
           </section>
-
-          <div class="actions">
-            <button type="submit" class="primary">计算 WFS 费用</button>
-            <button type="button" id="sample-standard" class="secondary">载入标准件示例</button>
-            <button type="button" id="sample-bulky" class="secondary">载入大件示例</button>
-          </div>
 
           <div class="tiny">
             本页只按你提供的 Walmart WFS PDF 实现当前规则，不与 Amazon 欧洲、英国、北美页共用任何数据文件。

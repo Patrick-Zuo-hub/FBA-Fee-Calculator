@@ -696,6 +696,7 @@
   </style>
   <script defer src="./profit-estimator.js"></script>
   <script defer src="./fba-surcharge-rules.js"></script>
+  <script defer src="./fba-history.js"></script>
   <script defer src="./fba-us-local-fee-calculator.js"></script>
 </head>
 <body>
@@ -810,6 +811,19 @@
             <input id="weight" name="weight" type="number" min="0.01" step="0.001" value="5.4" required />
           </div>
 
+          <div class="field">
+            <label for="historyNote">本次记录备注（可选）</label>
+            <input id="historyNote" type="text" maxlength="60" placeholder="例如：玻璃花瓶 / 供应商 A" />
+          </div>
+
+          <div class="actions actions--primary">
+            <button type="submit" class="primary">计算北美 FBA 费用</button>
+            <button type="button" id="sample-small" class="secondary">载入轻量示例</button>
+            <button type="button" id="sample-overmax" class="secondary">载入大件示例</button>
+          </div>
+
+          <h3 class="subsection-heading">附加条件</h3>
+
           <div class="toggle-list">
             <label class="toggle">
               <input id="fuelLogisticsSurcharge" name="fuelLogisticsSurcharge" type="checkbox" checked />
@@ -897,12 +911,6 @@
                 </div>
               </label>
             </div>
-          </div>
-
-          <div class="actions">
-            <button type="submit" class="primary">计算北美 FBA 费用</button>
-            <button type="button" id="sample-small" class="secondary">载入轻量示例</button>
-            <button type="button" id="sample-overmax" class="secondary">载入大件示例</button>
           </div>
 
           <div class="tiny">

@@ -23,6 +23,7 @@ const embeddedFiles = [
   "fba-fee-data.js",
   "fba-surcharge-rules.js",
   "profit-estimator.js",
+  "fba-history.js",
   "walmart-wfs-fee-calculator.html",
   "walmart-wfs-fee-calculator.js"
 ];

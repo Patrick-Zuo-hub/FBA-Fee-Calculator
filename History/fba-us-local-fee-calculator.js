@@ -461,6 +461,7 @@
   };
 
   const dom = {};
+  const historyApi = globalThis.FBA_HISTORY || {};
 
   function round2(value) {
     return Math.round(value * 100) / 100;
@@ -1709,7 +1710,66 @@
     bindProfitEstimator(view.market);
   }
 
-  function calculate() {
+  function buildHistoryRecord(input, view) {
+    if (typeof historyApi.createHistoryRecord !== "function") return null;
+    return historyApi.createHistoryRecord({
+      note: dom.historyNote ? dom.historyNote.value.trim() : "",
+      inputs: {
+        market: input.market,
+        category: input.category,
+        length: String(input.lengthRaw),
+        width: String(input.widthRaw),
+        height: String(input.heightRaw),
+        weight: String(input.weightRaw),
+        price: input.price == null ? "" : String(input.price),
+        dimensionUnit: input.dimensionUnit,
+        weightUnit: input.weightUnit,
+        fuelLogisticsSurcharge: input.fuelLogisticsSurcharge,
+        largeStandardDimMinimum: input.largeStandardDimMinimum,
+        sippCertified: input.sippCertified,
+        longTermDos: input.longTermDos == null ? "" : String(input.longTermDos),
+        shortTermDos: input.shortTermDos == null ? "" : String(input.shortTermDos),
+        groceryExempt: input.groceryExempt,
+        newSellerExempt: input.newSellerExempt,
+        newToFbaExempt: input.newToFbaExempt,
+        awdExempt: input.awdExempt,
+        slowMoverExempt: input.slowMoverExempt
+      },
+      resultSummary: {
+        totalFee: view.total,
+        totalFeeLabel: money(view.total, view.market),
+        dimensionsLabel: `${input.lengthRaw} × ${input.widthRaw} × ${input.heightRaw} ${input.dimensionUnit}`
+      }
+    });
+  }
+
+  function applyHistoryRecord(record) {
+    const input = record.inputs || {};
+    dom.market.value = input.market || "US";
+    syncMarketUi();
+    dom.category.value = input.category || dom.category.value;
+    dom.length.value = input.length || "";
+    dom.width.value = input.width || "";
+    dom.height.value = input.height || "";
+    dom.weight.value = input.weight || "";
+    dom.price.value = input.price == null ? "" : input.price;
+    dom.dimensionUnit.value = input.dimensionUnit || "in";
+    dom.weightUnit.value = input.weightUnit || "lb";
+    dom.fuelLogisticsSurcharge.checked = Boolean(input.fuelLogisticsSurcharge);
+    dom.largeStandardDimMinimum.checked = Boolean(input.largeStandardDimMinimum);
+    dom.sippCertified.checked = Boolean(input.sippCertified);
+    dom.longTermDos.value = input.longTermDos || "";
+    dom.shortTermDos.value = input.shortTermDos || "";
+    dom.groceryExempt.checked = Boolean(input.groceryExempt);
+    dom.newSellerExempt.checked = Boolean(input.newSellerExempt);
+    dom.newToFbaExempt.checked = Boolean(input.newToFbaExempt);
+    dom.awdExempt.checked = Boolean(input.awdExempt);
+    dom.slowMoverExempt.checked = Boolean(input.slowMoverExempt);
+    if (dom.historyNote) dom.historyNote.value = record.note || "";
+    calculate();
+  }
+
+  function calculate({ saveHistory = false } = {}) {
     const input = collectInput();
     if (!validateInput(input)) {
       dom.lastResultView = null;
@@ -1766,6 +1826,13 @@
       warnings: tier.warnings
     };
     renderResult(dom.lastResultView);
+    if (saveHistory && total != null && dom.historyManager) {
+      const record = buildHistoryRecord(input, dom.lastResultView);
+      if (record) {
+        dom.historyManager.saveRecord(record);
+        if (dom.historyDrawer) dom.historyDrawer.refresh();
+      }
+    }
   }
 
   function populateCategoryOptions(market) {
@@ -1943,6 +2010,14 @@
     dom.slowMoverExempt = document.getElementById("slowMoverExempt");
     dom.usOnlySection = document.getElementById("us-only-section");
     dom.resultIntro = document.getElementById("result-intro");
+    dom.historyNote = document.getElementById("historyNote");
+
+    if (typeof historyApi.createHistoryManager === "function") {
+      dom.historyManager = historyApi.createHistoryManager({
+        storageKey: "fba-history-na",
+        storage: globalThis.localStorage
+      });
+    }
 
     syncMarketUi();
     renderEmptyState(`先选择站点，再输入尺寸、重量、售价和费率类别，然后点击“计算北美 FBA 费用”。`);
@@ -1954,11 +2029,18 @@
 
     dom.form.addEventListener("submit", (event) => {
       event.preventDefault();
-      calculate();
+      calculate({ saveHistory: true });
     });
 
     document.getElementById("sample-small").addEventListener("click", () => loadExample("light"));
     document.getElementById("sample-overmax").addEventListener("click", () => loadExample("heavy"));
+
+    if (dom.historyManager && typeof historyApi.mountHistoryDrawer === "function") {
+      dom.historyDrawer = historyApi.mountHistoryDrawer({
+        manager: dom.historyManager,
+        onRestore: applyHistoryRecord
+      });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", bindDom);
