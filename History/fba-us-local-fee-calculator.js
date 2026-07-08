@@ -460,6 +460,76 @@
     }
   };
 
+  const PEAK_FULFILLMENT = {
+    periodLabel: "October 15, 2026 - January 14, 2027",
+    us: {
+      smallStandard: [
+        { maxOz: 2, under10: 2.62, band10to50: 3.51, over50: 3.77 },
+        { maxOz: 4, under10: 2.68, band10to50: 3.61, over50: 3.87 },
+        { maxOz: 6, under10: 2.76, band10to50: 3.65, over50: 3.91 },
+        { maxOz: 8, under10: 2.86, band10to50: 3.74, over50: 4.00 },
+        { maxOz: 10, under10: 2.98, band10to50: 3.89, over50: 4.15 },
+        { maxOz: 12, under10: 3.03, band10to50: 3.99, over50: 4.25 },
+        { maxOz: 14, under10: 3.14, band10to50: 4.13, over50: 4.39 },
+        { maxOz: 16, under10: 3.17, band10to50: 4.18, over50: 4.44 }
+      ],
+      largeStandardBands: [
+        { maxLb: 0.25, label: "4 oz or less", under10: 3.15, band10to50: 3.97, over50: 4.23 },
+        { maxLb: 0.5, label: "4+ to 8 oz", under10: 3.39, band10to50: 4.21, over50: 4.47 },
+        { maxLb: 0.75, label: "8+ to 12 oz", under10: 3.66, band10to50: 4.48, over50: 4.74 },
+        { maxLb: 1, label: "12+ to 16 oz", under10: 4.07, band10to50: 4.89, over50: 5.15 },
+        { maxLb: 1.25, label: "1+ to 1.25 lb", under10: 4.52, band10to50: 5.34, over50: 5.60 },
+        { maxLb: 1.5, label: "1.25+ to 1.5 lb", under10: 4.91, band10to50: 5.73, over50: 5.99 },
+        { maxLb: 1.75, label: "1.5+ to 1.75 lb", under10: 5.07, band10to50: 5.89, over50: 6.15 },
+        { maxLb: 2, label: "1.75+ to 2 lb", under10: 5.33, band10to50: 6.15, over50: 6.41 },
+        { maxLb: 2.25, label: "2+ to 2.25 lb", under10: 5.47, band10to50: 6.29, over50: 6.55 },
+        { maxLb: 2.5, label: "2.25+ to 2.5 lb", under10: 5.67, band10to50: 6.49, over50: 6.75 },
+        { maxLb: 2.75, label: "2.5+ to 2.75 lb", under10: 5.84, band10to50: 6.66, over50: 6.92 },
+        { maxLb: 3, label: "2.75+ to 3 lb", under10: 6.26, band10to50: 7.08, over50: 7.34 }
+      ],
+      largeStandardFormula: { under10: 6.69, band10to50: 7.51, over50: 7.77, increment: 0.08, stepLb: 0.25 },
+      smallBulkyFormula: { under10: 7.82, band10to50: 8.59, over50: 8.59, increment: 0.38, thresholdLb: 1 },
+      largeBulkyFormula: { under10: 9.62, band10to50: 10.39, over50: 10.39, increment: 0.38, thresholdLb: 1 },
+      xl0to50Formula: { under10: 28.29, band10to50: 29.06, over50: 29.06, increment: 0.38, thresholdLb: 1 },
+      xl50to70Formula: { under10: 39.36, band10to50: 40.13, over50: 40.13, increment: 0.75, thresholdLb: 51 },
+      xl70to150Formula: { under10: 54.97, band10to50: 55.74, over50: 55.74, increment: 0.75, thresholdLb: 71 },
+      xl150PlusFormula: { under10: 202.69, band10to50: 203.46, over50: 203.46, increment: 0.19, thresholdLb: 151 }
+    },
+    ca: {
+      envelopeFees: [
+        { maxKg: 0.1, label: "First 100 g", amount: 4.73 },
+        { maxKg: 0.2, label: "100+ to 200 g", amount: 4.99 },
+        { maxKg: 0.3, label: "200+ to 300 g", amount: 5.31 },
+        { maxKg: 0.4, label: "300+ to 400 g", amount: 5.60 },
+        { maxKg: 0.5, label: "400+ to 500 g", amount: 5.95 }
+      ],
+      standardFees: [
+        { maxKg: 0.1, label: "First 100 g", amount: 6.28 },
+        { maxKg: 0.2, label: "100+ to 200 g", amount: 6.49 },
+        { maxKg: 0.3, label: "200+ to 300 g", amount: 6.74 },
+        { maxKg: 0.4, label: "300+ to 400 g", amount: 7.13 },
+        { maxKg: 0.5, label: "400+ to 500 g", amount: 7.65 },
+        { maxKg: 0.6, label: "500+ to 600 g", amount: 7.84 },
+        { maxKg: 0.7, label: "600+ to 700 g", amount: 8.17 },
+        { maxKg: 0.8, label: "700+ to 800 g", amount: 8.43 },
+        { maxKg: 0.9, label: "800+ to 900 g", amount: 8.74 },
+        { maxKg: 1.0, label: "900+ to 1,000 g", amount: 8.99 },
+        { maxKg: 1.1, label: "1,000+ to 1,100 g", amount: 9.10 },
+        { maxKg: 1.2, label: "1,100+ to 1,200 g", amount: 9.37 },
+        { maxKg: 1.3, label: "1,200+ to 1,300 g", amount: 9.58 },
+        { maxKg: 1.4, label: "1,300+ to 1,400 g", amount: 9.85 },
+        { maxKg: 1.5, label: "1,400+ to 1,500 g", amount: 10.17 }
+      ],
+      standardOver: { base: 11.00, label: "1,500+ to 9,000 g", increment: 0.09, stepKg: 0.1 },
+      oversize: {
+        small_oversize: { base: 16.77, increment: 0.46, label: "First 500 g (32 kg or less)" },
+        medium_oversize: { base: 41.64, increment: 0.52, label: "First 500 g (68 kg or less)" },
+        large_oversize: { base: 89.59, increment: 0.58, label: "First 500 g (68 kg or less)" },
+        special_oversize: { base: 166.85, increment: 0.58, label: "First 500 g (over 68 kg)" }
+      }
+    }
+  };
+
   const dom = {};
   const historyApi = globalThis.FBA_HISTORY || {};
 
@@ -595,6 +665,22 @@
     return "不适用";
   }
 
+  function peakFulfillmentInfo(input, applied, detail) {
+    return {
+      label: "Peak fulfilment fee",
+      enabled: input.peakFulfillmentFees,
+      applied,
+      detail
+    };
+  }
+
+  function withPeakFulfillment(base, input, applied, detail) {
+    return {
+      ...base,
+      peakFulfillment: peakFulfillmentInfo(input, applied, detail)
+    };
+  }
+
   function collectInput() {
     const fd = new FormData(dom.form);
     const length = Number(fd.get("length"));
@@ -625,6 +711,7 @@
       unitWeightLb: toPounds(weight, weightUnit),
       unitWeightKg: toKilograms(weight, weightUnit),
       fuelLogisticsSurcharge: fd.get("fuelLogisticsSurcharge") === "on",
+      peakFulfillmentFees: fd.get("peakFulfillmentFees") === "on",
       largeStandardDimMinimum: fd.get("largeStandardDimMinimum") === "on",
       sippCertified: fd.get("sippCertified") === "on",
       longTermDos: fd.get("longTermDos") ? Number(fd.get("longTermDos")) : null,
@@ -977,17 +1064,17 @@
     return classifyMx(input);
   }
 
-  function smallStandardFeeUs(category, price, shippingWeightLb) {
+  function smallStandardFeeUs(category, price, shippingWeightLb, feeSource = DATA.us.smallStandard[category]) {
     const weightOz = shippingWeightLb * 16;
-    const band = bandByLimit(DATA.us.smallStandard[category], weightOz, "maxOz");
+    const band = bandByLimit(feeSource, weightOz, "maxOz");
     return {
       amount: band[priceBandUs(price)],
       bandLabel: `up to ${band.maxOz} oz`
     };
   }
 
-  function largeStandardFeeUs(category, price, shippingWeightLb) {
-    const fixedBand = DATA.us.largeStandardBands[category].find((row) => shippingWeightLb <= row.maxLb + 1e-9);
+  function largeStandardFeeUs(category, price, shippingWeightLb, bands = DATA.us.largeStandardBands[category], formulaSource = DATA.us.largeStandardFormula[category]) {
+    const fixedBand = bands.find((row) => shippingWeightLb <= row.maxLb + 1e-9);
     if (fixedBand) {
       return {
         amount: fixedBand[priceBandUs(price)],
@@ -995,7 +1082,7 @@
       };
     }
 
-    const formula = DATA.us.largeStandardFormula[category];
+    const formula = formulaSource;
     const intervals = Math.max(0, Math.ceil(((shippingWeightLb - 3) / formula.stepLb) - 1e-9));
     return {
       amount: formula[priceBandUs(price)] + (intervals * formula.increment),
@@ -1010,119 +1097,144 @@
 
   function baseFeeUs(input, tier) {
     const band = priceBandUs(input.price);
+    const peakDetail = `Using 2026 Peak fulfilment fee table for ${PEAK_FULFILLMENT.periodLabel}.`;
+
+    if (input.peakFulfillmentFees && input.category !== "non_apparel") {
+      const base = baseFeeUs({ ...input, peakFulfillmentFees: false }, tier);
+      return withPeakFulfillment(
+        { ...base, peakFulfillment: undefined },
+        input,
+        false,
+        "US peak table is excluding apparel and does not include dangerous goods rows; current base fulfilment fee is kept."
+      );
+    }
+
+    const usePeak = input.peakFulfillmentFees && input.category === "non_apparel";
+    const smallStandardSource = usePeak ? PEAK_FULFILLMENT.us.smallStandard : DATA.us.smallStandard[input.category];
+    const largeStandardBands = usePeak ? PEAK_FULFILLMENT.us.largeStandardBands : DATA.us.largeStandardBands[input.category];
+    const largeStandardFormula = usePeak ? PEAK_FULFILLMENT.us.largeStandardFormula : DATA.us.largeStandardFormula[input.category];
+    const formulaSource = (key) => {
+      if (!usePeak) return DATA.us[key][input.category];
+      return PEAK_FULFILLMENT.us[key];
+    };
 
     if (tier.key === "small_standard") {
-      const result = smallStandardFeeUs(input.category, input.price, tier.feeShippingWeight);
-      return {
+      const result = smallStandardFeeUs(input.category, input.price, tier.feeShippingWeight, smallStandardSource);
+      return withPeakFulfillment({
         amount: result.amount,
         bandLabel: result.bandLabel,
         explanation: "Small standard-size fees use unit weight only.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
     if (tier.key === "large_standard") {
-      const result = largeStandardFeeUs(input.category, input.price, tier.feeShippingWeight);
-      return {
+      const result = largeStandardFeeUs(input.category, input.price, tier.feeShippingWeight, largeStandardBands, largeStandardFormula);
+      return withPeakFulfillment({
         amount: result.amount,
         bandLabel: result.bandLabel,
         explanation: "Large standard-size fees use the greater of unit weight or dimensional weight.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
     if (tier.key === "small_bulky") {
-      return {
-        amount: intervalFee(DATA.us.smallBulkyFormula[input.category], band, tier.feeShippingWeight, 1, 1),
+      return withPeakFulfillment({
+        amount: intervalFee(formulaSource("smallBulkyFormula"), band, tier.feeShippingWeight, 1, 1),
         bandLabel: "0 to 50 lb; billed by 1 lb interval above first lb",
         explanation: "Small Bulky fees use the greater of unit weight or dimensional weight.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
     if (tier.key === "large_bulky") {
-      return {
-        amount: intervalFee(DATA.us.largeBulkyFormula[input.category], band, tier.feeShippingWeight, 1, 1),
+      return withPeakFulfillment({
+        amount: intervalFee(formulaSource("largeBulkyFormula"), band, tier.feeShippingWeight, 1, 1),
         bandLabel: "0 to 50 lb; billed by 1 lb interval above first lb",
         explanation: "Large Bulky fees use the greater of unit weight or dimensional weight.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
     if (tier.key === "xl_0_50") {
-      return {
-        amount: intervalFee(DATA.us.xl0to50Formula[input.category], band, tier.feeShippingWeight, 1, 1),
+      return withPeakFulfillment({
+        amount: intervalFee(formulaSource("xl0to50Formula"), band, tier.feeShippingWeight, 1, 1),
         bandLabel: "0 to 50 lb; billed by 1 lb interval above first lb",
         explanation: "Extra-Large 0 to 50 lb fees use the greater of unit weight or dimensional weight.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
     if (tier.key === "xl_50_70") {
-      return {
-        amount: intervalFee(DATA.us.xl50to70Formula[input.category], band, tier.feeShippingWeight, 51, 1),
+      return withPeakFulfillment({
+        amount: intervalFee(formulaSource("xl50to70Formula"), band, tier.feeShippingWeight, 51, 1),
         bandLabel: "50+ to 70 lb; billed by 1 lb interval above 51 lb",
         explanation: "Extra-Large 50+ to 70 lb fees use the greater of unit weight or dimensional weight.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
     if (tier.key === "xl_70_150") {
-      return {
-        amount: intervalFee(DATA.us.xl70to150Formula[input.category], band, tier.feeShippingWeight, 71, 1),
+      return withPeakFulfillment({
+        amount: intervalFee(formulaSource("xl70to150Formula"), band, tier.feeShippingWeight, 71, 1),
         bandLabel: "70+ to 150 lb; billed by 1 lb interval above 71 lb",
         explanation: "Extra-Large 70+ to 150 lb fees use the greater of unit weight or dimensional weight.",
         supported: true
-      };
+      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
     }
 
-    return {
-      amount: intervalFee(DATA.us.xl150PlusFormula[input.category], band, tier.feeShippingWeight, 151, 1),
+    return withPeakFulfillment({
+      amount: intervalFee(formulaSource("xl150PlusFormula"), band, tier.feeShippingWeight, 151, 1),
       bandLabel: "150+ lb; billed by 1 lb interval above 151 lb",
       explanation: "Extra-Large 150+ lb fees use unit weight only.",
       supported: true
-    };
+    }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
   }
 
-  function baseFeeCa(tier) {
+  function baseFeeCa(input, tier) {
+    const source = input.peakFulfillmentFees ? PEAK_FULFILLMENT.ca : DATA.ca;
+    const peakDetail = input.peakFulfillmentFees
+      ? `Using 2026 Peak fulfilment fee table for ${PEAK_FULFILLMENT.periodLabel}.`
+      : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.";
+
     if (tier.key === "envelope") {
-      const band = bandByLimit(DATA.ca.envelopeFees, tier.feeShippingWeight, "maxKg");
-      return {
+      const band = bandByLimit(source.envelopeFees, tier.feeShippingWeight, "maxKg");
+      return withPeakFulfillment({
         amount: band.amount,
         bandLabel: band.label,
         explanation: "CA envelope fulfilment fees use shipping weight rounded up to the nearest 100 g.",
         supported: true
-      };
+      }, input, input.peakFulfillmentFees, peakDetail);
     }
 
     if (tier.key === "standard") {
-      const fixedBand = DATA.ca.standardFees.find((row) => tier.feeShippingWeight <= row.maxKg + 1e-9);
+      const fixedBand = source.standardFees.find((row) => tier.feeShippingWeight <= row.maxKg + 1e-9);
       if (fixedBand) {
-        return {
+        return withPeakFulfillment({
           amount: fixedBand.amount,
           bandLabel: fixedBand.label,
           explanation: "CA standard fulfilment fees use shipping weight rounded up to the nearest 100 g.",
           supported: true
-        };
+        }, input, input.peakFulfillmentFees, peakDetail);
       }
 
       const intervals = Math.max(0, Math.round((tier.feeShippingWeight - 1.5) / 0.1));
-      return {
-        amount: DATA.ca.standardOver.base + (intervals * DATA.ca.standardOver.increment),
-        bandLabel: `${DATA.ca.standardOver.label} (${intervals} interval${intervals === 1 ? "" : "s"} above first 1,500 g)`,
+      return withPeakFulfillment({
+        amount: source.standardOver.base + (intervals * source.standardOver.increment),
+        bandLabel: `${source.standardOver.label} (${intervals} interval${intervals === 1 ? "" : "s"} above first 1,500 g)`,
         explanation: "CA standard fulfilment fees above 1,500 g add CAD 0.09 per additional 100 g interval.",
         supported: true
-      };
+      }, input, input.peakFulfillmentFees, peakDetail);
     }
 
-    const formula = DATA.ca.oversize[tier.key];
+    const formula = source.oversize[tier.key];
     const intervals = Math.max(0, Math.round((tier.feeShippingWeight - 0.5) / 0.5));
-    return {
+    return withPeakFulfillment({
       amount: formula.base + (intervals * formula.increment),
       bandLabel: `${formula.label}${intervals > 0 ? ` (${intervals} interval${intervals === 1 ? "" : "s"} above first 500 g)` : ""}`,
       explanation: "CA oversize fulfilment fees use shipping weight rounded up to the nearest 500 g.",
       supported: true
-    };
+    }, input, input.peakFulfillmentFees, peakDetail);
   }
 
   function baseFeeMx(input, tier) {
@@ -1200,8 +1312,15 @@
 
   function baseFee(input, tier) {
     if (input.market === "US") return baseFeeUs(input, tier);
-    if (input.market === "CA") return baseFeeCa(tier);
-    return baseFeeMx(input, tier);
+    if (input.market === "CA") return baseFeeCa(input, tier);
+    return withPeakFulfillment(
+      baseFeeMx(input, tier),
+      input,
+      false,
+      input.peakFulfillmentFees
+        ? "No MX peak fulfilment fee table was provided; current base fulfilment fee is kept."
+        : "Peak fulfilment fee is not selected; using the regular base fulfilment fee."
+    );
   }
 
   function lowInventoryExemptionReasons(input) {
@@ -1591,6 +1710,18 @@
       </div>
     `);
 
+    if (view.peakFulfillment && view.peakFulfillment.enabled) {
+      breakdown.push(`
+        <div class="line-item">
+          <div>
+            <strong>${view.peakFulfillment.label}</strong>
+            <span>${view.peakFulfillment.detail}</span>
+          </div>
+          <div class="amount ${view.peakFulfillment.applied ? "plus" : ""}">${view.peakFulfillment.applied ? "Applied" : "Not applied"}</div>
+        </div>
+      `);
+    }
+
     breakdown.push(`
       <div class="line-item">
         <div>
@@ -1639,6 +1770,7 @@
 
     const notes = [
       view.baseExplanation,
+      ...(view.peakFulfillment && view.peakFulfillment.enabled ? [view.peakFulfillment.detail] : []),
       view.fuelLogistics.detail,
       view.sipp.reason,
       view.lowInventory.reason,
@@ -1725,6 +1857,7 @@
         dimensionUnit: input.dimensionUnit,
         weightUnit: input.weightUnit,
         fuelLogisticsSurcharge: input.fuelLogisticsSurcharge,
+        peakFulfillmentFees: input.peakFulfillmentFees,
         largeStandardDimMinimum: input.largeStandardDimMinimum,
         sippCertified: input.sippCertified,
         longTermDos: input.longTermDos == null ? "" : String(input.longTermDos),
@@ -1756,6 +1889,7 @@
     dom.dimensionUnit.value = input.dimensionUnit || "in";
     dom.weightUnit.value = input.weightUnit || "lb";
     dom.fuelLogisticsSurcharge.checked = Boolean(input.fuelLogisticsSurcharge);
+    dom.peakFulfillmentFees.checked = Boolean(input.peakFulfillmentFees);
     dom.largeStandardDimMinimum.checked = Boolean(input.largeStandardDimMinimum);
     dom.sippCertified.checked = Boolean(input.sippCertified);
     dom.longTermDos.value = input.longTermDos || "";
@@ -1814,6 +1948,7 @@
       baseDetail: `${base.bandLabel}${input.market === "CA" ? "" : ` · ${priceBandLabel(input)}`} · ${DATA.categories[input.market][input.category].label}`,
       baseExplanation: base.explanation,
       baseSupported: base.supported,
+      peakFulfillment: base.peakFulfillment,
       fuelLogistics,
       sipp,
       sippCertified: input.sippCertified,
@@ -1898,6 +2033,7 @@
         dom.price.value = "8.99";
         dom.category.value = "non_apparel";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = true;
         dom.longTermDos.value = "12";
@@ -1912,6 +2048,7 @@
         dom.price.value = "79";
         dom.category.value = "non_apparel";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = false;
         dom.longTermDos.value = "";
@@ -1930,6 +2067,7 @@
         dom.weight.value = "0.222";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = true;
       } else {
@@ -1939,6 +2077,7 @@
         dom.weight.value = "44.23";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = false;
       }
@@ -1955,6 +2094,7 @@
         dom.price.value = "499";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = true;
       } else {
@@ -1965,6 +2105,7 @@
         dom.price.value = "13900";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
+        dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
         dom.sippCertified.checked = false;
       }
@@ -1999,6 +2140,7 @@
     dom.weight = document.getElementById("weight");
     dom.price = document.getElementById("price");
     dom.fuelLogisticsSurcharge = document.getElementById("fuelLogisticsSurcharge");
+    dom.peakFulfillmentFees = document.getElementById("peakFulfillmentFees");
     dom.largeStandardDimMinimum = document.getElementById("largeStandardDimMinimum");
     dom.sippCertified = document.getElementById("sippCertified");
     dom.longTermDos = document.getElementById("longTermDos");

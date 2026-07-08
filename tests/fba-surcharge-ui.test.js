@@ -11,6 +11,8 @@ const euHtml = fs.readFileSync(path.join(root, "History", "fba-eu-uk-fee-calcula
 test("NA calculator loads the surcharge rules and shows a checked toggle", () => {
   assert.match(naHtml, /fba-surcharge-rules\.js/);
   assert.match(naHtml, /id="fuelLogisticsSurcharge"/);
+  assert.match(naHtml, /id="peakFulfillmentFees"[^>]*type="checkbox"/);
+  assert.doesNotMatch(naHtml, /id="peakFulfillmentFees"[^>]*checked/);
   assert.match(naHtml, /type="checkbox" checked/);
 });
 

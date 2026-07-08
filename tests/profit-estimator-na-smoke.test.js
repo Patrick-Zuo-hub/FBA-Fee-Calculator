@@ -90,6 +90,7 @@ function setupNaCalculator() {
     { id: "weight", name: "weight" },
     { id: "price", name: "price" },
     { id: "fuelLogisticsSurcharge", name: "fuelLogisticsSurcharge" },
+    { id: "peakFulfillmentFees", name: "peakFulfillmentFees" },
     { id: "largeStandardDimMinimum", name: "largeStandardDimMinimum" },
     { id: "sippCertified", name: "sippCertified" },
     { id: "longTermDos", name: "longTermDos" },
