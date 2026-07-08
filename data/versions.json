@@ -2,8 +2,8 @@
   "na": {
     "name": "Amazon NA",
     "route": "/na/",
-    "updatedAt": "2026-04-03",
-    "status": "Fuel surcharge toggle available for US/CA",
+    "updatedAt": "2026-07-08",
+    "status": "2026 peak fulfilment fee toggle available for US/CA",
     "coverage": "US / CA / MX"
   },
   "eu-uk": {
@@ -22,6 +22,12 @@
   },
   "homepageUpdates": [
     {
+      "date": "2026-07-08",
+      "module": "na",
+      "title": "2026 peak fulfilment fees for NA",
+      "summary": "Amazon NA now includes an optional US/CA peak-period base fulfilment fee mode for October 15, 2026 through January 14, 2027."
+    },
+    {
       "date": "2026-04-03",
       "module": "na",
       "title": "Fuel surcharge support for NA",
@@ -35,6 +41,12 @@
     }
   ],
   "updates": [
+    {
+      "date": "2026-07-08",
+      "module": "na",
+      "title": "2026 peak fulfilment fees for NA",
+      "summary": "Amazon NA now includes an optional US/CA peak-period base fulfilment fee mode for October 15, 2026 through January 14, 2027."
+    },
     {
       "date": "2026-04-03",
       "module": "na",
