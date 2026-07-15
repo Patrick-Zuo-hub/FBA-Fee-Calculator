@@ -28,7 +28,7 @@ test("EU & UK route uses the shared shell", () => {
   assert.match(euUkPage, /<body[^>]*data-route="eu-uk">/);
   assert.match(euUkPage, /<link rel="stylesheet" href="\/assets\/site\.css" \/>/);
   assert.match(euUkPage, /<script defer src="\/assets\/site\.js"><\/script>/);
-  assert.match(euUkPage, /2026-04-03/);
+  assert.match(euUkPage, /2026-07-15/);
   assert.match(euUkPage, /<iframe[^>]*src="\/History\/fba-eu-uk-fee-calculator\.html"/);
   assert.match(euUkPage, /<iframe[^>]*title="Amazon EU & UK FBA Fee Calculator"/);
 });

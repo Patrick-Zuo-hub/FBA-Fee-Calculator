@@ -1315,36 +1315,54 @@
       return baseFee + (extraSteps * incrementFee);
     }
 
+    const peakPublicationMetadata = {
+      localStandard: {
+        "large-envelope": ["UK", "CEP", "DE"],
+        "extra-large-envelope": ["UK", "CEP", "DE"],
+        "small-parcel": ["UK", "CEP", "DE"],
+        "standard-parcel": ["UK", "CEP", "DE"]
+      },
+      selectedLocalParcel: {
+        "small-parcel-1": ["UK", "CEP", "DE"],
+        "small-parcel-2": ["UK", "CEP", "DE"],
+        "small-parcel-3": ["UK", "CEP", "DE"],
+        "medium-parcel-1": ["UK", "CEP", "DE"],
+        "medium-parcel-2": ["UK", "CEP", "DE"],
+        "large-parcel-1": ["UK", "CEP", "DE"],
+        "large-parcel-2": ["UK", "CEP", "DE"]
+      },
+      efnStandard: {
+        "extra-large-envelope": ["EU4", "DE_NON_CEE", "UK_TO_EU4", "EU4_TO_UK"],
+        "small-parcel": ["EU4", "DE_NON_CEE", "UK_TO_EU4", "EU4_TO_UK"],
+        "standard-parcel": ["EU4", "DE_NON_CEE", "UK_TO_EU4", "EU4_TO_UK"]
+      },
+      selectedEfnParcel: {
+        "small-parcel-1": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"],
+        "small-parcel-2": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"],
+        "small-parcel-3": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"],
+        "medium-parcel-1": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"],
+        "medium-parcel-2": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"],
+        "large-parcel-1": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"],
+        "large-parcel-2": ["CEP", "DE", "UK_TO_EU4", "EU4_TO_UK"]
+      }
+    };
+
     function peakFeeIsPublished(input, route, fee) {
       if (!input.festiveSeasonPeak || route.mode.startsWith("ie_")) return false;
 
-      const tables = route.mode === "local"
-        ? (fee.selectedParcelTier ? [data.PEAK_SELECTED_LOCAL_PARCEL, data.SELECTED_LOCAL_PARCEL] : [data.PEAK_LOCAL_STANDARD, data.LOCAL_STANDARD])
+      const tableKey = route.mode === "local"
+        ? (fee.selectedParcelTier ? "selectedLocalParcel" : "localStandard")
         : (["efn", "remote_uk_to_eu", "remote_eu_to_uk"].includes(route.mode)
-          ? (fee.selectedParcelTier ? [data.PEAK_SELECTED_EFN_PARCEL, data.SELECTED_EFN_PARCEL] : [data.PEAK_EFN_STANDARD, data.EFN_STANDARD])
+          ? (fee.selectedParcelTier ? "selectedEfnParcel" : "efnStandard")
           : null);
-      if (!tables) return false;
-
-      const [peakRows, baseRows] = tables;
-      const peakTier = peakRows.find((item) => item.key === fee.sizeKey);
-      const baseTier = baseRows.find((item) => item.key === fee.sizeKey);
-      if (!peakTier || !baseTier) return false;
+      if (!tableKey) return false;
 
       const feeColumn = fee.selectedParcelTier
         ? route.mode === "local" ? selectLocalColumn(input.destination, input.cepEnrolled) : selectEfnSelectedColumn(route, input)
         : route.mode === "local" ? selectLocalColumn(input.destination, input.cepEnrolled) : selectEfnStandardColumn(route, input);
       if (!feeColumn) return false;
 
-      if (peakTier.bands && baseTier.bands) {
-        const peakBand = feeFromBands(peakTier.bands, fee.shippingWeightKg);
-        const baseBand = feeFromBands(baseTier.bands, fee.shippingWeightKg);
-        return Boolean(peakBand && baseBand && peakBand.fees[feeColumn] !== baseBand.fees[feeColumn]);
-      }
-      return Boolean(
-        peakTier.baseFees && baseTier.baseFees &&
-        (peakTier.baseFees[feeColumn] !== baseTier.baseFees[feeColumn] ||
-          peakTier.incrementFees[feeColumn] !== baseTier.incrementFees[feeColumn])
-      );
+      return Boolean(peakPublicationMetadata[tableKey][fee.sizeKey]?.includes(feeColumn));
     }
 
     function computeStandardBase(input, route, notes) {

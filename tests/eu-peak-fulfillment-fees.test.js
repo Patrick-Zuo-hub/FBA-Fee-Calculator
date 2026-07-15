@@ -218,3 +218,20 @@ test("EU low-price selection stays outside festive peak fees", () => {
   assert.match(markup, /Festive season peak/);
   assert.match(markup, /Low-price fee table is outside the published festive peak table/);
 });
+
+test("EU published peak metadata marks unchanged CEP large-envelope as applied", () => {
+  const { elements, context } = loadCalculator();
+  setCommonInput(elements, { origin: "DE", destination: "DE", weight: 0.9 });
+  elements.length.value = "33";
+  elements.width.value = "23";
+  elements.height.value = "4";
+  elements["cep-enrolled"].checked = true;
+  elements["festive-season-peak"].checked = true;
+
+  const markup = submit(elements);
+
+  assert.equal(context.window.__lastResultView.primaryTotal, 2.78);
+  assert.match(markup, /Applied/);
+  assert.match(markup, /using published peak fee values for this tier/);
+  assert.doesNotMatch(markup, /No published peak fee for this tier/);
+});
