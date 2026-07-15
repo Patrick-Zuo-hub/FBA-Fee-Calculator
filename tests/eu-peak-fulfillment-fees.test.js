@@ -197,3 +197,24 @@ test("EU oversize fee remains unchanged when festive peak is enabled", () => {
   assert.match(peakMarkup, /No published peak fee for this tier/);
   assert.match(peakMarkup, /non-peak fee used/);
 });
+
+test("EU low-price selection stays outside festive peak fees", () => {
+  const { elements, context } = loadCalculator();
+  setLocalUkSmallParcelInput(elements);
+  elements.weight.value = "0.4";
+  elements.price.value = "15";
+  elements["use-low-price"].checked = true;
+  elements["festive-season-peak"].checked = false;
+
+  submit(elements);
+  const nonPeakTotal = context.window.__lastResultView.primaryTotal;
+
+  elements["festive-season-peak"].checked = true;
+  const markup = submit(elements);
+
+  assert.equal(context.window.__lastResultView.primaryTotal, nonPeakTotal);
+  assert.equal(context.window.__lastResultView.festiveSeasonPeak.applied, false);
+  assert.match(markup, /Low-price/);
+  assert.match(markup, /Festive season peak/);
+  assert.match(markup, /Low-price fee table is outside the published festive peak table/);
+});

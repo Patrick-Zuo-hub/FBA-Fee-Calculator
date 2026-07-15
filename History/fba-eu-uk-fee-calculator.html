@@ -766,6 +766,14 @@
               </label>
 
               <label class="toggle">
+                <input id="festive-season-peak" name="festiveSeasonPeak" type="checkbox" />
+                <div>
+                  <strong>Festive season peak</strong>
+                  <span>按 2026-10-15 至 2027-01-14 的公开旺季 fulfilment fee 估算；未列出旺季费率的路线和尺寸档位仍按非旺季费率。</span>
+                </div>
+              </label>
+
+              <label class="toggle">
                 <input id="pan-eu" name="panEu" type="checkbox" />
                 <div>
                   <strong>跨欧盟订单按 Pan-EU local fulfilment 计算</strong>
@@ -1110,7 +1118,8 @@
         cepEnrolled: payload.get("cepEnrolled") === "on",
         hazmat: payload.get("hazmat") === "on",
         sipp: payload.get("sipp") === "on",
-        fuelLogisticsSurcharge: payload.get("fuelLogisticsSurcharge") === "on"
+        fuelLogisticsSurcharge: payload.get("fuelLogisticsSurcharge") === "on",
+        festiveSeasonPeak: payload.get("festiveSeasonPeak") === "on"
       };
     }
 
@@ -1160,17 +1169,17 @@
       return tiers.find((tier) => fitsDims(dims, tier.maxDims) && input.weightKg <= tier.maxUnitWeightKg) || null;
     }
 
-    function classifyEuropeStandard(input) {
+    function classifyEuropeStandard(input, rows = data.LOCAL_STANDARD) {
       const dims = sortedDims(input.length, input.width, input.height);
       const dimWeight = dimensionalWeightKg(input.length, input.width, input.height);
       const girth = girthCm(dims);
       const longest = dims[0];
 
       if (input.weightKg > 31.5 || longest > 175 || girth > 360) {
-        return data.LOCAL_STANDARD.find((item) => item.key === "special-oversize");
+        return rows.find((item) => item.key === "special-oversize");
       }
 
-      const byKey = (key) => data.LOCAL_STANDARD.find((item) => item.key === key);
+      const byKey = (key) => rows.find((item) => item.key === key);
 
       if (fitsDims(dims, [33, 23, 2.5]) && input.weightKg <= 0.1) return byKey("light-envelope");
       if (fitsDims(dims, [33, 23, 2.5]) && input.weightKg <= 0.46) return byKey("standard-envelope");
@@ -1306,11 +1315,47 @@
       return baseFee + (extraSteps * incrementFee);
     }
 
+    function peakFeeIsPublished(input, route, fee) {
+      if (!input.festiveSeasonPeak || route.mode.startsWith("ie_")) return false;
+
+      const tables = route.mode === "local"
+        ? (fee.selectedParcelTier ? [data.PEAK_SELECTED_LOCAL_PARCEL, data.SELECTED_LOCAL_PARCEL] : [data.PEAK_LOCAL_STANDARD, data.LOCAL_STANDARD])
+        : (["efn", "remote_uk_to_eu", "remote_eu_to_uk"].includes(route.mode)
+          ? (fee.selectedParcelTier ? [data.PEAK_SELECTED_EFN_PARCEL, data.SELECTED_EFN_PARCEL] : [data.PEAK_EFN_STANDARD, data.EFN_STANDARD])
+          : null);
+      if (!tables) return false;
+
+      const [peakRows, baseRows] = tables;
+      const peakTier = peakRows.find((item) => item.key === fee.sizeKey);
+      const baseTier = baseRows.find((item) => item.key === fee.sizeKey);
+      if (!peakTier || !baseTier) return false;
+
+      const feeColumn = fee.selectedParcelTier
+        ? route.mode === "local" ? selectLocalColumn(input.destination, input.cepEnrolled) : selectEfnSelectedColumn(route, input)
+        : route.mode === "local" ? selectLocalColumn(input.destination, input.cepEnrolled) : selectEfnStandardColumn(route, input);
+      if (!feeColumn) return false;
+
+      if (peakTier.bands && baseTier.bands) {
+        const peakBand = feeFromBands(peakTier.bands, fee.shippingWeightKg);
+        const baseBand = feeFromBands(baseTier.bands, fee.shippingWeightKg);
+        return Boolean(peakBand && baseBand && peakBand.fees[feeColumn] !== baseBand.fees[feeColumn]);
+      }
+      return Boolean(
+        peakTier.baseFees && baseTier.baseFees &&
+        (peakTier.baseFees[feeColumn] !== baseTier.baseFees[feeColumn] ||
+          peakTier.incrementFees[feeColumn] !== baseTier.incrementFees[feeColumn])
+      );
+    }
+
     function computeStandardBase(input, route, notes) {
       const currency = route.currency;
       const isIERoute = route.mode.startsWith("ie_");
+      const localStandard = input.festiveSeasonPeak ? data.PEAK_LOCAL_STANDARD : data.LOCAL_STANDARD;
+      const selectedLocalParcel = input.festiveSeasonPeak ? data.PEAK_SELECTED_LOCAL_PARCEL : data.SELECTED_LOCAL_PARCEL;
+      const efnStandard = input.festiveSeasonPeak ? data.PEAK_EFN_STANDARD : data.EFN_STANDARD;
+      const selectedEfnParcel = input.festiveSeasonPeak ? data.PEAK_SELECTED_EFN_PARCEL : data.SELECTED_EFN_PARCEL;
       const selectedTier = input.selectedCategory
-        ? classifySelectedParcel(input, isIERoute ? data.IE_SELECTED : data.SELECTED_LOCAL_PARCEL)
+        ? classifySelectedParcel(input, isIERoute ? data.IE_SELECTED : selectedLocalParcel)
         : null;
 
       if (input.selectedCategory && !selectedTier) {
@@ -1386,7 +1431,7 @@
 
       if (route.mode === "local") {
         if (selectedTier) {
-          const tier = data.SELECTED_LOCAL_PARCEL.find((item) => item.key === selectedTier.key);
+          const tier = selectedLocalParcel.find((item) => item.key === selectedTier.key);
           const feeColumn = selectLocalColumn(input.destination, input.cepEnrolled);
           const amount = feeFromPer100g(tier.baseFees[feeColumn], tier.incrementFees[feeColumn], input.weightKg);
           return {
@@ -1403,7 +1448,7 @@
           };
         }
 
-        const tier = classifyEuropeStandard(input);
+        const tier = classifyEuropeStandard(input, localStandard);
         const weightInfo = shippingWeightForTier(input, tier);
         const feeColumn = selectLocalColumn(input.destination, input.cepEnrolled);
 
@@ -1446,7 +1491,7 @@
 
       if (route.mode === "efn" || route.mode === "remote_uk_to_eu" || route.mode === "remote_eu_to_uk") {
         if (selectedTier) {
-          const tier = data.SELECTED_EFN_PARCEL.find((item) => item.key === selectedTier.key);
+          const tier = selectedEfnParcel.find((item) => item.key === selectedTier.key);
           const feeColumn = selectEfnSelectedColumn(route, input);
           if (!feeColumn || tier.baseFees[feeColumn] == null) {
             return { error: "这条 Remote / EFN 路径在 selected parcel fee 表里没有明确报价。" };
@@ -1465,11 +1510,11 @@
           };
         }
 
-        const baseTier = classifyEuropeStandard(input);
+        const baseTier = classifyEuropeStandard(input, efnStandard);
         if (baseTier.key === "special-oversize") {
           return { error: "EFN / Remote 表里没有 Special oversize 报价，需要人工复核。" };
         }
-        const tier = data.EFN_STANDARD.find((item) => item.key === baseTier.key);
+        const tier = efnStandard.find((item) => item.key === baseTier.key);
         if (!tier) {
           return { error: "没有找到与当前 size tier 对应的 EFN / Remote 费率行。" };
         }
@@ -1805,6 +1850,13 @@
             </div>
             <div class="row">
               <div>
+                <strong>${view.festiveSeasonPeak.label}</strong>
+                <span>${view.festiveSeasonPeak.detail}</span>
+              </div>
+              <div class="amount">${view.festiveSeasonPeak.enabled ? (view.festiveSeasonPeak.applied ? "Applied" : "Not applied") : "Not applied"}</div>
+            </div>
+            <div class="row">
+              <div>
                 <strong>${view.fuelLogistics.label}</strong>
                 <span>${view.fuelLogistics.detail}</span>
               </div>
@@ -1931,6 +1983,32 @@
       maybeAddLowInventoryFee(input, route, primaryFee, usingLowPrice, breakdown);
       maybeAddSippAdjustment(input, route, primaryFee, usingLowPrice, breakdown, notes);
       const fuelLogistics = fuelLogisticsSurchargeEu(input, primaryFee);
+      const peakApplied = !usingLowPrice && peakFeeIsPublished(input, route, standardBase);
+      const lowPricePeakFallback = input.festiveSeasonPeak && usingLowPrice;
+      const festiveSeasonPeak = {
+        enabled: input.festiveSeasonPeak,
+        applied: peakApplied,
+        label: "Festive season peak",
+        detail: !input.festiveSeasonPeak
+          ? "Using 2026 non-peak fulfilment fee values."
+          : lowPricePeakFallback
+            ? "October 15, 2026 to January 14, 2027. Low-price fee table is outside the published festive peak table; non-peak low-price fee used."
+          : peakApplied
+            ? "October 15, 2026 to January 14, 2027; using published peak fee values for this tier."
+            : "October 15, 2026 to January 14, 2027. No published peak fee for this tier; non-peak fee used."
+      };
+      if (lowPricePeakFallback) {
+        notes.push({
+          type: "info",
+          text: "The selected low-price fee is outside the festive peak table, so the non-peak low-price fee is used."
+        });
+      }
+      if (input.festiveSeasonPeak) {
+        notes.push({
+          type: "warn",
+          text: "Amazon's festive peak table excludes apparel. This calculator does not collect an apparel flag, so apparel results require manual review."
+        });
+      }
 
       const total = round2(
         primaryFee.amount + fuelLogistics.amount + breakdown.reduce((sum, item) => {
@@ -1954,6 +2032,7 @@
         baseFeeTitle: usingLowPrice ? "Low-price 基础费" : "基础 fulfilment fee",
         baseFeeDetail: `${primaryFee.tableLabel}，size tier = ${primaryFee.sizeLabel}`,
         baseFeeAmount: primaryFee.amount,
+        festiveSeasonPeak,
         fuelLogistics,
         altFee,
         breakdown,
@@ -2003,6 +2082,7 @@
       document.getElementById("hazmat").checked = false;
       document.getElementById("sipp").checked = false;
       document.getElementById("fuel-logistics-surcharge").checked = true;
+      document.getElementById("festive-season-peak").checked = false;
       calculate();
     });
 
