@@ -9,8 +9,8 @@
   "eu-uk": {
     "name": "Amazon EU & UK",
     "route": "/eu-uk/",
-    "updatedAt": "2026-04-03",
-    "status": "Fuel surcharge toggle available for eligible destinations",
+    "updatedAt": "2026-07-15",
+    "status": "Festive season peak toggle available for published EU/UK routes.",
     "coverage": "UK / FR / DE / IT / ES / PL / SE / NL / IE / BE"
   },
   "walmart": {
@@ -21,6 +21,12 @@
     "coverage": "Walmart US"
   },
   "homepageUpdates": [
+    {
+      "date": "2026-07-15",
+      "module": "eu-uk",
+      "title": "EU/UK festive season peak fees",
+      "summary": "The EU/UK calculator now supports optional festive-season peak fulfilment fees for October 15, 2026 through January 14, 2027, based on the published rate card."
+    },
     {
       "date": "2026-07-08",
       "module": "na",
@@ -41,6 +47,12 @@
     }
   ],
   "updates": [
+    {
+      "date": "2026-07-15",
+      "module": "eu-uk",
+      "title": "EU/UK festive season peak fees",
+      "summary": "The EU/UK calculator now supports optional festive-season peak fulfilment fees for October 15, 2026 through January 14, 2027, based on the published rate card."
+    },
     {
       "date": "2026-07-08",
       "module": "na",

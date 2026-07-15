@@ -16,8 +16,10 @@ test("NA calculator loads the surcharge rules and shows a checked toggle", () =>
   assert.match(naHtml, /type="checkbox" checked/);
 });
 
-test("EU calculator loads the surcharge rules and shows a checked toggle", () => {
+test("EU calculator loads the surcharge rules and shows an unchecked festive peak toggle", () => {
   assert.match(euHtml, /fba-surcharge-rules\.js/);
   assert.match(euHtml, /id="fuel-logistics-surcharge"/);
   assert.match(euHtml, /type="checkbox" checked/);
+  assert.match(euHtml, /<input(?=[^>]*\bid="festive-season-peak")(?=[^>]*\btype="checkbox")[^>]*>/);
+  assert.doesNotMatch(euHtml, /<input(?=[^>]*\bid="festive-season-peak")(?=[^>]*\btype="checkbox")[^>]*\bchecked(?:\s|=|>)/);
 });

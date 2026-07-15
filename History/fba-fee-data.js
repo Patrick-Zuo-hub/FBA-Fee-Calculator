@@ -319,6 +319,124 @@ window.FBA_FEE_DATA = (() => {
     { key: "large-parcel-2", label: "Large Parcel 2", maxDims: [45, 34, 26], maxUnitWeightKg: 11.9, baseFees: { CEP: 11.78, DE: 12.04, FR: 11.78, IT: 11.78, ES: 11.78, NL: 13.52, PL: 57.82, BE: 13.52, SE: 139.18, EU4_TO_UK: 5.62, UK_TO_EU4: 9.72, UK_TO_NLBE: 12.68, UK_TO_SE: 134.18 }, incrementFees: { CEP: 0.09, DE: 0.09, FR: 0.09, IT: 0.09, ES: 0.09, NL: 0.07, PL: 0.29, BE: 0.07, SE: 0.07, EU4_TO_UK: 0.01, UK_TO_EU4: 0.07, UK_TO_NLBE: 0.06, UK_TO_SE: 0.67 } }
   ];
 
+  function cloneRows(rows) {
+    return rows.map((row) => ({
+      ...row,
+      maxDims: row.maxDims && [...row.maxDims],
+      bands: row.bands && row.bands.map((band) => ({
+        ...band,
+        fees: band.fees && { ...band.fees }
+      })),
+      baseFees: row.baseFees && { ...row.baseFees },
+      incrementFees: row.incrementFees && { ...row.incrementFees }
+    }));
+  }
+
+  function applyPeakOverrides(rows, overrides, tableName) {
+    const peakRows = cloneRows(rows);
+    Object.entries(overrides).forEach(([tierKey, tierOverrides]) => {
+      const tier = peakRows.find((row) => row.key === tierKey);
+      if (!tier) throw new Error(`Peak override table ${tableName}: unknown tier "${tierKey}"`);
+      (tierOverrides.bands || []).forEach(({ maxWeightKg, fees }) => {
+        const band = tier.bands && tier.bands.find((item) => item.maxWeightKg === maxWeightKg);
+        if (!band) {
+          throw new Error(`Peak override table ${tableName}, tier "${tierKey}": unknown band maxWeightKg ${maxWeightKg}`);
+        }
+        if (!band.fees) {
+          throw new Error(`Peak override table ${tableName}, tier "${tierKey}": band maxWeightKg ${maxWeightKg} has no fees`);
+        }
+        Object.assign(band.fees, fees);
+      });
+      if (tierOverrides.baseFees) {
+        if (!tier.baseFees) throw new Error(`Peak override table ${tableName}, tier "${tierKey}": row has no baseFees`);
+        Object.assign(tier.baseFees, tierOverrides.baseFees);
+      }
+      if (tierOverrides.incrementFees) {
+        if (!tier.incrementFees) throw new Error(`Peak override table ${tableName}, tier "${tierKey}": row has no incrementFees`);
+        Object.assign(tier.incrementFees, tierOverrides.incrementFees);
+      }
+    });
+    return peakRows;
+  }
+
+  // Source: 260630-FBA-Rate-Card-EN1.pdf, page 7, effective 15 October 2026 to 14 January 2027; local standard, UK/CEP/DE columns.
+  const LOCAL_STANDARD_PEAK_OVERRIDES = {
+    "large-envelope": { bands: [{ maxWeightKg: 0.96, fees: { UK: 2.79, CEP: 2.78, DE: 3.04 } }] },
+    "extra-large-envelope": { bands: [{ maxWeightKg: 0.96, fees: { UK: 3.01, CEP: 3.16, DE: 3.42 } }] },
+    "small-parcel": { bands: [
+      { maxWeightKg: 0.15, fees: { UK: 3.02, CEP: 3.33, DE: 3.59 } },
+      { maxWeightKg: 0.4, fees: { UK: 3.11, CEP: 3.34, DE: 3.6 } },
+      { maxWeightKg: 0.9, fees: { UK: 3.15, CEP: 3.35, DE: 3.61 } },
+      { maxWeightKg: 1.4, fees: { UK: 3.16, CEP: 3.37, DE: 3.63 } },
+      { maxWeightKg: 1.9, fees: { UK: 3.37, CEP: 3.39, DE: 3.65 } },
+      { maxWeightKg: 3.9, fees: { UK: 3.39, CEP: 4.57, DE: 4.83 } }
+    ] },
+    "standard-parcel": { bands: [
+      { maxWeightKg: 0.15, fees: { UK: 3.05, CEP: 3.34, DE: 3.6 } },
+      { maxWeightKg: 0.4, fees: { UK: 3.12, CEP: 3.38, DE: 3.64 } },
+      { maxWeightKg: 0.9, fees: { UK: 3.18, CEP: 3.4, DE: 3.66 } },
+      { maxWeightKg: 1.4, fees: { UK: 3.38, CEP: 3.92, DE: 4.18 } },
+      { maxWeightKg: 1.9, fees: { UK: 3.61, CEP: 3.94, DE: 4.2 } },
+      { maxWeightKg: 2.9, fees: { UK: 3.62, CEP: 4.58, DE: 4.84 } },
+      { maxWeightKg: 3.9, fees: { UK: 3.67, CEP: 5.16, DE: 5.42 } },
+      { maxWeightKg: 5.9, fees: { UK: 3.69, CEP: 5.3, DE: 5.56 } },
+      { maxWeightKg: 8.9, fees: { UK: 3.7, CEP: 6.16, DE: 6.42 } },
+      { maxWeightKg: 11.9, fees: { UK: 3.71, CEP: 6.83, DE: 7.09 } }
+    ] }
+  };
+
+  // Source: 260630-FBA-Rate-Card-EN1.pdf, page 9, effective 15 October 2026 to 14 January 2027; selected local parcels, UK/CEP/DE columns.
+  const SELECTED_LOCAL_PARCEL_PEAK_OVERRIDES = {
+    "small-parcel-1": { baseFees: { UK: 2.94, CEP: 3.25, DE: 3.51 }, incrementFees: { UK: 0.02, CEP: 0.05, DE: 0.05 } },
+    "small-parcel-2": { baseFees: { UK: 2.98, CEP: 3.29, DE: 3.55 }, incrementFees: { UK: 0.02, CEP: 0.06, DE: 0.06 } },
+    "small-parcel-3": { baseFees: { UK: 3.02, CEP: 3.33, DE: 3.59 }, incrementFees: { UK: 0.02, CEP: 0.07, DE: 0.07 } },
+    "medium-parcel-1": { baseFees: { UK: 3.08, CEP: 3.46, DE: 3.72 }, incrementFees: { UK: 0.02, CEP: 0.07, DE: 0.07 } },
+    "medium-parcel-2": { baseFees: { UK: 3.22, CEP: 3.71, DE: 3.97 }, incrementFees: { UK: 0.03, CEP: 0.07, DE: 0.07 } },
+    "large-parcel-1": { baseFees: { UK: 3.47, CEP: 3.96, DE: 4.22 }, incrementFees: { UK: 0.03, CEP: 0.07, DE: 0.07 } },
+    "large-parcel-2": { baseFees: { UK: 4.12, CEP: 4.4, DE: 4.66 }, incrementFees: { UK: 0.03, CEP: 0.09, DE: 0.09 } }
+  };
+
+  // Source: 260630-FBA-Rate-Card-EN1.pdf, page 13, effective 15 October 2026 to 14 January 2027; EFN standard published EU4/DE_NON_CEE/UK_TO_EU4/EU4_TO_UK columns.
+  const EFN_STANDARD_PEAK_OVERRIDES = {
+    "extra-large-envelope": { bands: [{ maxWeightKg: 0.96, fees: { EU4: 6.72, DE_NON_CEE: 6.98, UK_TO_EU4: 6.41, EU4_TO_UK: 3.89 } }] },
+    "small-parcel": { bands: [
+      { maxWeightKg: 0.15, fees: { EU4: 7.06, DE_NON_CEE: 7.32, UK_TO_EU4: 6.62, EU4_TO_UK: 4.5 } },
+      { maxWeightKg: 0.4, fees: { EU4: 7.53, DE_NON_CEE: 7.79, UK_TO_EU4: 7.07, EU4_TO_UK: 4.61 } },
+      { maxWeightKg: 0.9, fees: { EU4: 9.03, DE_NON_CEE: 9.29, UK_TO_EU4: 8.47, EU4_TO_UK: 4.79 } },
+      { maxWeightKg: 1.4, fees: { EU4: 9.91, DE_NON_CEE: 10.17, UK_TO_EU4: 9.32, EU4_TO_UK: 5.04 } },
+      { maxWeightKg: 1.9, fees: { EU4: 11.3, DE_NON_CEE: 11.56, UK_TO_EU4: 10.61, EU4_TO_UK: 5.53 } },
+      { maxWeightKg: 3.9, fees: { EU4: 14.34, DE_NON_CEE: 14.6, UK_TO_EU4: 13.46, EU4_TO_UK: 5.64 } }
+    ] },
+    "standard-parcel": { bands: [
+      { maxWeightKg: 0.15, fees: { EU4: 7.08, DE_NON_CEE: 7.34, UK_TO_EU4: 6.65, EU4_TO_UK: 4.92 } },
+      { maxWeightKg: 0.4, fees: { EU4: 8.26, DE_NON_CEE: 8.52, UK_TO_EU4: 7.76, EU4_TO_UK: 5.17 } },
+      { maxWeightKg: 0.9, fees: { EU4: 9.82, DE_NON_CEE: 10.08, UK_TO_EU4: 9.22, EU4_TO_UK: 5.39 } },
+      { maxWeightKg: 1.4, fees: { EU4: 11.14, DE_NON_CEE: 11.4, UK_TO_EU4: 10.46, EU4_TO_UK: 5.47 } },
+      { maxWeightKg: 1.9, fees: { EU4: 12.79, DE_NON_CEE: 13.05, UK_TO_EU4: 12.01, EU4_TO_UK: 5.96 } },
+      { maxWeightKg: 2.9, fees: { EU4: 14.34, DE_NON_CEE: 14.6, UK_TO_EU4: 13.46, EU4_TO_UK: 7.19 } },
+      { maxWeightKg: 3.9, fees: { EU4: 16.88, DE_NON_CEE: 17.14, UK_TO_EU4: 15.86, EU4_TO_UK: 9.07 } },
+      { maxWeightKg: 5.9, fees: { EU4: 17.81, DE_NON_CEE: 18.07, UK_TO_EU4: 16.72, EU4_TO_UK: 10 } },
+      { maxWeightKg: 8.9, fees: { EU4: 19.3, DE_NON_CEE: 19.56, UK_TO_EU4: 18.12, EU4_TO_UK: 10.19 } },
+      { maxWeightKg: 11.9, fees: { EU4: 22.69, DE_NON_CEE: 22.95, UK_TO_EU4: 21.3, EU4_TO_UK: 10.72 } }
+    ] }
+  };
+
+  // Source: 260630-FBA-Rate-Card-EN1.pdf, page 15, effective 15 October 2026 to 14 January 2027; selected EFN parcels, published CEP/DE/UK_TO_EU4/EU4_TO_UK columns.
+  const SELECTED_EFN_PARCEL_PEAK_OVERRIDES = {
+    "small-parcel-1": { baseFees: { CEP: 7.27, DE: 7.53, UK_TO_EU4: 5.99, EU4_TO_UK: 3.36 }, incrementFees: { CEP: 0.01, DE: 0.01, UK_TO_EU4: 0.01, EU4_TO_UK: 0.01 } },
+    "small-parcel-2": { baseFees: { CEP: 7.75, DE: 8.01, UK_TO_EU4: 6.39, EU4_TO_UK: 3.59 }, incrementFees: { CEP: 0.02, DE: 0.02, UK_TO_EU4: 0.01, EU4_TO_UK: 0.01 } },
+    "small-parcel-3": { baseFees: { CEP: 8.71, DE: 8.97, UK_TO_EU4: 7.19, EU4_TO_UK: 4.04 }, incrementFees: { CEP: 0.04, DE: 0.04, UK_TO_EU4: 0.03, EU4_TO_UK: 0.02 } },
+    "medium-parcel-1": { baseFees: { CEP: 9.2, DE: 9.46, UK_TO_EU4: 7.59, EU4_TO_UK: 4.25 }, incrementFees: { CEP: 0.05, DE: 0.05, UK_TO_EU4: 0.04, EU4_TO_UK: 0.03 } },
+    "medium-parcel-2": { baseFees: { CEP: 11.13, DE: 11.39, UK_TO_EU4: 9.19, EU4_TO_UK: 5.16 }, incrementFees: { CEP: 0.1, DE: 0.1, UK_TO_EU4: 0.07, EU4_TO_UK: 0.04 } },
+    "large-parcel-1": { baseFees: { CEP: 11.61, DE: 11.87, UK_TO_EU4: 9.58, EU4_TO_UK: 5.37 }, incrementFees: { CEP: 0.1, DE: 0.1, UK_TO_EU4: 0.07, EU4_TO_UK: 0.04 } },
+    "large-parcel-2": { baseFees: { CEP: 12.59, DE: 12.85, UK_TO_EU4: 10.38, EU4_TO_UK: 5.83 }, incrementFees: { CEP: 0.1, DE: 0.1, UK_TO_EU4: 0.07, EU4_TO_UK: 0.04 } }
+  };
+
+  const PEAK_LOCAL_STANDARD = applyPeakOverrides(LOCAL_STANDARD, LOCAL_STANDARD_PEAK_OVERRIDES, "LOCAL_STANDARD");
+  const PEAK_SELECTED_LOCAL_PARCEL = applyPeakOverrides(SELECTED_LOCAL_PARCEL, SELECTED_LOCAL_PARCEL_PEAK_OVERRIDES, "SELECTED_LOCAL_PARCEL");
+  const PEAK_EFN_STANDARD = applyPeakOverrides(EFN_STANDARD, EFN_STANDARD_PEAK_OVERRIDES, "EFN_STANDARD");
+  const PEAK_SELECTED_EFN_PARCEL = applyPeakOverrides(SELECTED_EFN_PARCEL, SELECTED_EFN_PARCEL_PEAK_OVERRIDES, "SELECTED_EFN_PARCEL");
+
   const PAN_EU_OVERSIZE_SURCHARGE = {
     "small-oversize": { baseBandMaxKg: 0.76, baseFees: { DE: 1.64, FR: 1.4, IT: 0.63, ES: 0.77 }, incrementFees: { DE: 0.03, FR: 0.07, IT: 0.08, ES: 0.12 } },
     "standard-oversize-light": { baseBandMaxKg: 0.76, baseFees: { DE: 1.76, FR: 1.41, IT: 1.05, ES: 1.59 }, incrementFees: { DE: 0.06, FR: 0.14, IT: 0.19, ES: 0.12 } },
@@ -516,6 +634,10 @@ window.FBA_FEE_DATA = (() => {
     SELECTED_LOCAL_PARCEL,
     EFN_STANDARD,
     SELECTED_EFN_PARCEL,
+    PEAK_LOCAL_STANDARD,
+    PEAK_SELECTED_LOCAL_PARCEL,
+    PEAK_EFN_STANDARD,
+    PEAK_SELECTED_EFN_PARCEL,
     PAN_EU_OVERSIZE_SURCHARGE,
     LOW_INVENTORY_STANDARD,
     LOW_INVENTORY_SELECTED,

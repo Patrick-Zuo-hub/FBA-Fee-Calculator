@@ -171,6 +171,7 @@ test("EU sample includes surcharge by default and removes it when unchecked", ()
     { id: "dos30", name: "dos30" },
     { id: "dos90", name: "dos90" },
     { id: "fuel-logistics-surcharge", name: "fuelLogisticsSurcharge" },
+    { id: "festive-season-peak", name: "festiveSeasonPeak" },
     { id: "pan-eu", name: "panEu" },
     { id: "selected-category", name: "selectedCategory" },
     { id: "low-price-special", name: "lowPriceSpecial" },
@@ -182,6 +183,7 @@ test("EU sample includes surcharge by default and removes it when unchecked", ()
 
   elements["fee-form"].__elements = elements;
   elements["fuel-logistics-surcharge"].checked = true;
+  elements["festive-season-peak"].checked = true;
   elements["use-low-price"].checked = true;
   elements["cep-enrolled"].checked = true;
 
@@ -201,6 +203,7 @@ test("EU sample includes surcharge by default and removes it when unchecked", ()
   vm.runInNewContext(extractInlineScript(html), context);
 
   elements["example-btn"].listeners.click();
+  assert.equal(elements["festive-season-peak"].checked, false);
   const withSurchargeMarkup = elements["result-root"].innerHTML;
   const totalWithSurcharge = parseCurrencyValue(withSurchargeMarkup, "€");
 
