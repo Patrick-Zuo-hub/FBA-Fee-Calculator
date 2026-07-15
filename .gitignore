@@ -1,5 +1,6 @@
 .DS_Store
 .vercel/
+.worktrees/
 .superpowers/
 dist/
 node_modules/
