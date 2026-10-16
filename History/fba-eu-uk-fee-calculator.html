@@ -295,6 +295,15 @@
       border: 1px solid rgba(63, 46, 32, 0.08);
     }
 
+    .size-tier-guide { border: 1px solid var(--line, #e2e8f0); border-radius: 22px; padding: 20px; }
+    .size-tier-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .size-tier-card { background: #f7faff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; overflow-wrap: anywhere; }
+    .size-tier-card h4 { margin: 0 0 8px; }
+    .size-tier-card p { margin: 0; font-size: 14px; }
+    .size-tier-card.is-current { border-color: #167d87; background: #eaf8f6; box-shadow: inset 0 0 0 1px #167d87; }
+    .size-tier-current { display: block; color: #14636a; font-size: 13px; margin-bottom: 8px; }
+    @media (max-width: 640px) { .size-tier-grid { grid-template-columns: 1fr; } }
+
     .tiny {
       font-size: 12px;
       color: var(--muted);
@@ -745,6 +754,14 @@
               <button type="button" id="example-btn" class="ghost">载入一个 Pan-EU 示例</button>
             </div>
 
+            <section class="size-tier-guide" aria-labelledby="size-tier-guide-title">
+              <h3 id="size-tier-guide-title">EU &amp; UK Size Tier</h3>
+              <p id="size-tier-guide-intro"></p>
+              <p id="size-tier-guide-status" role="status" aria-live="polite"></p>
+              <div class="size-tier-grid" id="size-tier-guide-grid"></div>
+              <p class="tiny">尺寸按最长边 × 次长边 × 最短边比较；按顺序匹配首个符合条件的层级。体积重 = 长 × 宽 × 高 ÷ 5000。Low-Price 的适用范围与重量档位请查看计算结果。</p>
+            </section>
+
             <div class="double">
               <div class="field">
                 <label for="dos30">30 天 Days of Supply（可选）</label>
@@ -1194,6 +1211,45 @@
       if (input.weightKg > 23 && input.weightKg <= 31.5 && dimWeight <= 126) return byKey("heavy-oversize");
       if (input.weightKg <= 23 && dimWeight <= 126) return byKey("bulky-oversize");
       return byKey("special-oversize");
+    }
+
+    function renderSizeTierGuide() {
+      const grid = document.getElementById("size-tier-guide-grid");
+      if (!grid) return;
+      const input = getInput();
+      const route = determineRoute(input);
+      const ireland = route.mode.startsWith("ie_");
+      const local = route.mode === "local";
+      const standard = ireland ? data.IE_STANDARD : local ? data.LOCAL_STANDARD : data.EFN_STANDARD;
+      const selected = ireland ? data.IE_SELECTED : local ? data.SELECTED_LOCAL_PARCEL : data.SELECTED_EFN_PARCEL;
+      const valid = [input.length, input.width, input.height, input.weightKg].every((value) => Number.isFinite(value) && value > 0);
+      const selectedMatch = valid && input.selectedCategory ? classifySelectedParcel(input, ireland ? data.IE_SELECTED : data.SELECTED_LOCAL_PARCEL) : null;
+      const match = valid ? selectedMatch || (ireland ? classifyIEStandard(input) : classifyEuropeStandard(input, standard)) : null;
+      const rows = input.selectedCategory
+        ? standard.filter((row) => !row.key.includes("parcel")).concat(selected)
+        : standard.slice();
+      rows.sort((a, b) => {
+        const group = (row) => row.key.includes("envelope") ? 0 : row.key.includes("parcel") ? 1 : 2;
+        return group(a) - group(b);
+      });
+      if (ireland) rows.push({ key: "special-oversize", label: "Special oversize" });
+      document.getElementById("size-tier-guide-intro").textContent = route.mode === "unsupported"
+        ? "当前国家组合暂无支持的履约路径；以下仅供尺寸对照。"
+        : `${data.COUNTRIES[input.destination].label} · ${route.label} · ${input.selectedCategory ? "Selected parcel categories（非 parcel 回退标准规则）" : "标准尺寸规则"}`;
+      document.getElementById("size-tier-guide-status").textContent = route.mode === "unsupported" ? "当前路径不支持费用计算。" : !valid ? "输入有效尺寸和重量后，将高亮当前层级。" : `当前尺寸层级：${match ? match.label : "未匹配"}（标准费规则）`;
+      grid.innerHTML = rows.map((tier) => {
+        const limits = [];
+        if (tier.maxDims) limits.push(`尺寸 ≤ ${tier.maxDims.join(" × ")} cm`);
+        if (tier.minUnitWeightKg) limits.push(`实际重量 > ${Math.round(tier.minUnitWeightKg)} kg`);
+        if (tier.maxUnitWeightKg) limits.push(`实际重量 ${ireland && tier.key === "standard-oversize" ? "<" : "≤"} ${tier.maxUnitWeightKg} kg`);
+        if (tier.maxDimWeightKg) limits.push(`体积重 ${ireland && tier.key === "standard-oversize" ? "<" : "≤"} ${tier.maxDimWeightKg} kg`);
+        if (tier.key.includes("oversize") && tier.key !== "special-oversize") limits.push("最长边 ≤ 175 cm；长 + 围长 ≤ 360 cm");
+        if (tier.key === "special-oversize") limits.push("实际重量 > 31.5 kg，或最长边 > 175 cm，或长 + 围长 > 360 cm，或超出其他层级条件" + (ireland ? "；当前费表不支持" : ""));
+        const isSelected = selected.includes(tier);
+        limits.push(isSelected || tier.shippingWeight === "unit" ? "按实际重量计费" : "按实际重量与体积重较大值计费");
+        const current = route.mode !== "unsupported" && match && match.key === tier.key;
+        return `<article class="size-tier-card${current ? " is-current" : ""}"><h4>${tier.label}</h4>${current ? '<strong class="size-tier-current">当前输入所在层级</strong>' : ""}<p>${limits.join("<br>")}</p></article>`;
+      }).join("");
     }
 
     function classifyIELowPrice(input) {
@@ -1923,6 +1979,7 @@
     let historyDrawer = null;
 
     function calculate({ saveHistory = false } = {}) {
+      renderSizeTierGuide();
       const input = getInput();
       const dimsValid = [input.length, input.width, input.height, input.weightKg].every((value) => Number.isFinite(value) && value > 0);
       if (!dimsValid) {
@@ -2104,7 +2161,11 @@
       calculate();
     });
 
+    form.addEventListener("input", renderSizeTierGuide);
+    form.addEventListener("change", renderSizeTierGuide);
+
     populateCountries();
+    renderSizeTierGuide();
     renderEmptyState("请先输入合法的尺寸和重量。");
     if (historyManager && typeof historyApi.mountHistoryDrawer === "function") {
       historyDrawer = historyApi.mountHistoryDrawer({
