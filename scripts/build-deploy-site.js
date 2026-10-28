@@ -9,6 +9,7 @@ const embeddedRoot = path.join(distRoot, "embedded");
 const siteEntries = [
   "index.html",
   "na",
+  "au",
   "eu-uk",
   "walmart",
   "changelog",

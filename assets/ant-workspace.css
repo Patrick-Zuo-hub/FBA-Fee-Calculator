@@ -1,0 +1,61 @@
+/* Shared Ant Design workspace and graceful static fallback. */
+:root { --accent:#1677ff; --ink:#262626; --muted:#8c8c8c; --line:#f0f0f0; --panel:#fff; --radius-xl:8px; --radius-lg:8px; --shadow:none; }
+body { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif; color:#262626; }
+.ant-ready > .site-shell { display:none; }
+.ant-workspace { min-height:100vh; }
+.app-sidebar { border-right:1px solid #f0f0f0; position:fixed!important; top:0; bottom:0; left:0; z-index:20; }
+.app-sidebar + .ant-layout { margin-left:240px; }
+.app-brand { display:flex; align-items:center; gap:12px; padding:28px 24px 32px; text-decoration:none; color:#141414; font-size:20px; font-weight:650; }
+.app-brand small { display:block; color:#8c8c8c; font-weight:400; font-size:10px; margin-top:3px; }
+.app-mark { display:grid; place-items:center; width:36px; height:36px; background:#1677ff; color:#fff; border-radius:8px; }
+.app-sidebar .ant-menu { padding:0 10px; border-inline-end:0!important; }
+.sidebar-footer { position:absolute; bottom:20px; left:24px; font-size:12px; }
+.app-header { display:flex; align-items:center; justify-content:space-between; padding:0 32px!important; border-bottom:1px solid #f0f0f0; height:64px!important; line-height:normal!important; }
+.app-content { padding:32px; width:100%; max-width:1600px; margin:auto; }
+.page-title { display:flex; justify-content:space-between; margin-bottom:24px; }
+.page-title h2 { margin-top:0!important; margin-bottom:8px!important; font-size:26px!important; }
+.page-title .ant-typography { margin-bottom:0; }
+.results-stack { display:grid; gap:24px; }
+.results-stack .ant-statistic-content { font-variant-numeric:tabular-nums; }
+.results-stack .ant-table { margin-top:16px; }
+.workspace-card { height:100%; }
+.update-rows { display:grid; gap:0; }
+.update-row { display:flex; align-items:flex-start; gap:20px; padding:20px 0; border-bottom:1px solid #f0f0f0; }
+.update-row:first-child { padding-top:0; }
+.update-row:last-child { border:0; padding-bottom:0; }
+.calculator-container > .ant-card-body { padding:0!important; }
+.ant-calculator-frame { display:block; width:100%; min-height:1800px; border:0; border-radius:8px; }
+.app-footer { color:#8c8c8c; font-size:12px; text-align:center; padding:32px 0 0; }
+.site-nav,.hero-card,.page-panel,.tool-card,.info-card { background:#fff; box-shadow:none; backdrop-filter:none; border:1px solid #f0f0f0; border-radius:8px; }
+.site-nav { position:static; }
+.eyebrow { border-radius:4px; letter-spacing:0; text-transform:none; padding:2px 8px; }
+.primary-btn,.secondary-btn { min-height:36px; border-radius:6px; font-size:14px; font-weight:400; }
+.tool-card:hover,.info-card:hover { transform:none; box-shadow:0 2px 8px #0000000a; }
+.au-fields input,.au-fields select { border-radius:6px; min-height:36px; }
+@media(max-width:991px) { .app-content{padding:20px;} .app-header{padding:0 20px!important;} }
+@media(max-width:575px) { .app-content{padding:16px;} .page-title h2{font-size:22px!important;} .ant-card-head{padding:0 16px!important;} .ant-card-body{padding:16px!important;} .update-row{flex-direction:column;gap:8px;} .app-footer{text-align:left;} }
+/* Embedded calculators share AU card spacing without an extra outer card. */
+.calculator-container { width:100%; min-width:0; }
+.ant-calculator-frame { min-height:600px; background:transparent; }
+/* Compact administration workspace, based on the supplied reference. */
+:root { --accent:#d92d27; }
+.app-header { position:fixed; inset:0 0 auto 0; z-index:30; height:56px!important; padding:0 24px!important; }
+.app-sidebar { top:56px; background:#fafafa!important; }
+.app-sidebar + .ant-layout { padding-top:56px; }
+.app-brand { padding:22px 20px; font-size:18px; }
+.app-mark { background:#d92d27; width:30px; height:30px; border-radius:6px; }
+.app-content { max-width:none; padding:24px; }
+.page-title { background:white; border-radius:6px; padding:20px; margin-bottom:20px; }
+.page-title h2 { font-size:20px!important; margin-bottom:6px!important; }
+.app-sidebar .ant-menu { background:transparent; }
+.results-stack { gap:20px; }
+.ant-card { border-radius:6px; box-shadow:none; }
+.ant-card-head { min-height:50px!important; font-size:15px!important; }
+.ant-card-body { padding:20px; }
+.ant-calculator-frame { border-radius:6px; }
+.primary-btn { background:#d92d27; }
+.eyebrow { color:#d92d27; background:#fff1f0; }
+@media(max-width:991px) { .ant-workspace > .ant-layout { padding-top:56px; } .app-content { padding:16px; } }
+.au-tier-card { height:100%; background:#fafafa; }
+.au-tier-card .ant-card-body { color:#8c8c8c; line-height:1.8; }
+.au-tier-card.is-current { border-color:#d92d27; background:#fff2f0; }

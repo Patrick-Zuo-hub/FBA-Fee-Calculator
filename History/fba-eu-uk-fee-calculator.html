@@ -6,7 +6,7 @@
   <title>Amazon EU & UK FBA Fee Calculator</title>
   <script src="./fba-fee-data.js"></script>
   <script src="./fba-surcharge-rules.js"></script>
-  <script src="./profit-estimator.js"></script>
+  <script src="./profit-estimator.js?v=20261028g"></script>
   <script src="./fba-history.js"></script>
   <style>
     :root {
@@ -657,8 +657,10 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../assets/ant-legacy.css?v=20261028g" />
+  <script defer src="../assets/ant-loader.js?v=20261028g"></script>
 </head>
-<body>
+<body data-ant-embedded="true">
   <div class="app">
     <section class="hero">
       <div class="hero-copy">
@@ -969,6 +971,7 @@
     }
 
     function bindProfitEstimator(market) {
+    window.layoutFeeWorkspace?.();
       const syncButton = document.getElementById("profitSyncButton");
       const calculateButton = document.getElementById("profitCalculateButton");
       if (!syncButton || !calculateButton) return;

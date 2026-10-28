@@ -7,6 +7,7 @@
     MX: { vat: 0, referralRate: 15, firstLegPriceRmbPerKg: 8, exchangeRate: 0.4 },
     EU: { vat: 20, referralRate: 15, firstLegPriceRmbPerKg: 8, exchangeRate: 7.8 },
     UK: { vat: 20, referralRate: 15, firstLegPriceRmbPerKg: 8, exchangeRate: 9 },
+    AU: { vat: 10, referralRate: 13, firstLegPriceRmbPerKg: 8, exchangeRate: 4.7 },
     Walmart: { vat: 0, referralRate: 15, firstLegPriceRmbPerKg: 8, exchangeRate: 7 }
   };
 
@@ -167,6 +168,16 @@
       ? result.message
       : "补全字段后计算";
 
+    const valid = result && result.success;
+    const amount = value => `${currency} ${Number(value).toFixed(2)}`;
+    const grossProfit = valid ? result.grossMarginRate * Number(state.grossSellingPrice) : null;
+    const rows = valid ? [
+      ["含税售价", Number(state.grossSellingPrice)],
+      ["售价税额（估算）", Number(state.grossSellingPrice) - result.netSellingPrice],
+      ["配送费", Number(state.fbaFee)],
+      ["销售佣金", Number(state.grossSellingPrice) * normalizePercent(state.referralRate)],
+      ["采购成本", result.productCostLocal], ["头程运费", result.firstLegCostLocal]
+    ].map(([label,value]) => `<div class="profit-breakdown-row"><span>${label}</span><span>${amount(value)}</span></div>`).join("") : "";
     return `
       <section class="card profit-estimator">
         <div class="profit-estimator__header">
@@ -220,10 +231,11 @@
 
           <div class="profit-estimator__side">
             <div class="profit-result-card">
-              <span class="profit-result-card__label">毛利率</span>
-              <strong class="profit-result-card__value">${resultValue}</strong>
+              <h3>单件利润</h3>
+              <div class="profit-kpis"><div><span class="profit-result-card__label">毛利</span><strong class="profit-result-card__value" style="color:${grossProfit >= 0 ? '#389e0d' : '#cf1322'}">${valid ? amount(grossProfit) : '--'}</strong></div><div><span class="profit-result-card__label">毛利率</span>
+              <strong class="profit-result-card__value">${resultValue}</strong></div></div>
               <p class="profit-result-card__hint">基于 VAT 后售价、FBA费用、头程运费、产品成本和销售佣金比例测算。</p>
-              <div class="profit-result-card__message">${resultMessage}</div>
+              <div class="profit-result-card__message">${resultMessage}</div>${rows}
             </div>
 
             <div class="profit-estimator__actions">

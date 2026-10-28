@@ -66,7 +66,7 @@ test("homepage and changelog contain live product content", () => {
   const versions = parseVersions();
   const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
   assert.match(homepage, /One polished entrance for every marketplace fee decision\./);
-  assert.match(homepage, /Internal fee tools for Amazon NA, Amazon EU & UK, and Walmart WFS, rebuilt into one premium static workspace\./);
+  assert.match(homepage, /Internal fee tools for Amazon NA, Amazon EU & UK, Amazon AU, and Walmart WFS, rebuilt into one premium static workspace\./);
   assert.equal((homepage.match(/data-homepage-update=/g) || []).length, versions.homepageUpdates.length);
   assert.equal((homepage.match(/data-changelog-entry=/g) || []).length, 0);
   versions.homepageUpdates.forEach((update) => {

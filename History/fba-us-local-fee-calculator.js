@@ -1637,6 +1637,7 @@
   }
 
   function bindProfitEstimator(market) {
+    window.layoutFeeWorkspace?.();
     const syncButton = document.getElementById("profitSyncButton");
     const calculateButton = document.getElementById("profitCalculateButton");
     if (!syncButton || !calculateButton) return;
@@ -1905,6 +1906,7 @@
 
   function calculate({ saveHistory = false } = {}) {
     const input = collectInput();
+    updateTierHighlight();
     if (!validateInput(input)) {
       dom.lastResultView = null;
       dom.profitResult = null;
@@ -1997,6 +1999,7 @@
     dom.priceHint.textContent = meta.priceHint;
     dom.categoryLabel.textContent = meta.categoryLabel;
     renderSizeTierGuide(market);
+    updateTierHighlight();
 
     if (meta.priceRequired) {
       dom.price.required = true;
@@ -2119,6 +2122,22 @@
     calculate();
   }
 
+  function updateTierHighlight() {
+    if(typeof document.querySelectorAll!=="function")return;
+    const cards=Array.from(document.querySelectorAll('#size-tier-guide-grid .guide-item'));
+    let tier=null;
+    try { const input=collectInput(); if([input.lengthIn,input.widthIn,input.heightIn,input.unitWeightLb].every(n=>Number.isFinite(n)&&n>0))tier=classifySizeTier(input); } catch(e) {}
+    const normalize=value=>String(value).toLowerCase().replace(/[^a-z0-9]/g,'');
+    const label=tier?normalize((tier.overmax ? 'Overmax' : tier.label)):'';
+    for(const card of cards){
+      const name=normalize(card.querySelector('strong')?.textContent||'');
+      const selected=!!label&&(label===name||name==='extralarge'&&label.startsWith('extralarge'));
+      card.classList.toggle('is-current-tier',selected);
+      card.querySelector('.current-tier-label')?.remove();
+      if(selected){const marker=document.createElement('div');marker.className='current-tier-label';marker.textContent='当前输入所在层级';card.querySelector('strong')?.after(marker);}
+    }
+  }
+
   function bindDom() {
     dom.form = document.getElementById("us-fee-form");
     dom.result = document.getElementById("result-root");
@@ -2169,6 +2188,9 @@
       calculate();
     });
 
+    dom.form.addEventListener("input", updateTierHighlight);
+    dom.form.addEventListener("change", updateTierHighlight);
+    updateTierHighlight();
     dom.form.addEventListener("submit", (event) => {
       event.preventDefault();
       calculate({ saveHistory: true });

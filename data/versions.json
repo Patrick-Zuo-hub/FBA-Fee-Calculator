@@ -22,6 +22,12 @@
   },
   "homepageUpdates": [
     {
+      "date": "2026-10-28",
+      "module": "au",
+      "title": "Amazon AU calculator",
+      "summary": "Australia FBA fees now include price and category discounts, dimensional weight, monthly storage and aged inventory estimates."
+    },
+    {
       "date": "2026-07-15",
       "module": "eu-uk",
       "title": "EU/UK festive season peak fees",
@@ -47,6 +53,12 @@
     }
   ],
   "updates": [
+    {
+      "date": "2026-10-28",
+      "module": "au",
+      "title": "Amazon AU calculator",
+      "summary": "Australia FBA fees now include price and category discounts, dimensional weight, monthly storage and aged inventory estimates."
+    },
     {
       "date": "2026-07-15",
       "module": "eu-uk",
@@ -77,5 +89,12 @@
       "title": "Original Walmart release",
       "summary": "The Walmart WFS workspace launched with the first production fee model."
     }
-  ]
+  ],
+  "au": {
+    "name": "Amazon AU",
+    "route": "/au/",
+    "updatedAt": "2026-10-28",
+    "status": "2026 AU fulfilment and storage fees active",
+    "coverage": "Australia"
+  }
 }

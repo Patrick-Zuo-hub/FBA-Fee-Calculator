@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <script defer src="/assets/site.js"></script>
+  <title>Marketplace Fee Studio | Amazon AU</title>
+  <link rel="stylesheet" href="/assets/ant-workspace.css?v=20261028f" />
+  <script defer src="/assets/ant-loader.js?v=20261028f"></script>
+</head>
+<body data-route="au">
+  <main class="site-shell">
+    <nav class="site-nav" data-nav-shell>
+      <a class="brand" href="/">Marketplace Fee Studio</a>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav-links">
+        Menu
+      </button>
+      <div class="nav-links" id="site-nav-links" data-nav-links>
+        <a href="/na/">NA</a>
+        <a href="/eu-uk/">EU & UK</a>
+        <a href="/au/">AU</a>
+        <a href="/walmart/">Walmart</a>
+        <a href="/changelog/">Changelog</a>
+      </div>
+    </nav>
+    <p class="site-notice" data-site-notice hidden role="status" aria-live="polite">
+      Live updates are unavailable right now. Static content is still available.
+    </p>
+
+    <section class="page-header">
+      <div class="hero-card"><span class="eyebrow">Australia · AUD · 2026-06-10 rates</span>
+        <h1>Amazon AU</h1><p class="muted">澳洲站 FBA 配送费与仓储费计算器 · 费率核对：2026-10-28</p></div>
+      <div class="page-panel">
+        <h2>输入单件包装信息</h2>
+        <form id="au-form">
+          <div class="au-fields">
+            <label>尺寸单位<select name="dimensionUnit"><option value="cm">cm</option><option value="in">inch</option></select></label>
+            <label>长<input name="length" type="number" min="0.000001" step="any" value="31.5" required></label>
+            <label>宽<input name="width" type="number" min="0.000001" step="any" value="6.7" required></label>
+            <label>高<input name="height" type="number" min="0.000001" step="any" value="7.2" required></label>
+            <label>重量单位<select name="weightUnit"><option value="kg">kg</option><option value="g">g</option><option value="lb">lb</option></select></label>
+            <label>实际重量<input name="weight" type="number" min="0.000001" step="any" value="0.56" required></label>
+            <label>售价（A$）<input name="price" type="number" min="0" step="any" value="10.99" required></label>
+            <label>收费类目<select name="category"><option value="home">Home and Kitchen</option><option value="pet">Pet Products</option><option value="grocery">Grocery and Gourmet</option><option value="sports">Sports and Outdoors</option><option value="other">其他类目</option></select></label>
+            <label>仓储月份<select name="season"><option value="regular">1–9 月</option><option value="peak">10–12 月</option></select></label>
+            <label>日均库存（件）<input name="quantity" type="number" min="0" step="1" value="1" required></label>
+            <label>库存库龄（天）<input name="age" type="number" min="0" step="1" value="0" required></label>
+          </div>
+          <button class="primary-btn" type="submit">计算 AU 费用</button>
+        </form>
+        <div id="au-result" aria-live="polite" class="page-header"></div>
+        <noscript>请启用 JavaScript 以计算 AU 费用。</noscript>
+      </div>
+      <div class="page-panel"><h2>计费口径与官方来源</h2>
+        <p>按单件商品包装尺寸测量，自动按最长边排序。信封按实际重量；Parcel / Oversize 按实际重量与体积重的较大值。体积重 = 长 × 宽 × 高（cm）÷ 4,000（kg），计费重量向上取整至 1 g。</p>
+        <p>配送费按售价与收费类目匹配。所有费用均为澳元，未含适用 GST。月仓储费按日均库存体积估算；超龄库存附加费在每月 15 日评估，单独列示。未包含销售佣金、广告、移除等费用。</p>
+        <p>常规 FBA 限制为 116 × 116 × 102 cm、23 kg；超限商品需特殊批准或受邀计划，页面仅显示参考费率，不代表可入仓。</p>
+        <p><a href="https://sellercentral.amazon.com.au/help/hub/reference/external/201112670" target="_blank" rel="noopener">Seller Central 配送费表（优先采用）</a> · <a href="https://sell.amazon.com.au/pricing" target="_blank" rel="noopener">AU 仓储与超龄库存费</a></p>
+        <p class="muted">招商页部分配送费与 Seller Central 存在差异，本计算器采用 Seller Central 的售价及类目分档。</p>
+      </div>
+    </section>
+  </main>
+  <script src="/assets/au-calculator.js"></script>
+  <script src="/assets/au-profit.js"></script>
+  <script src="/assets/au-profit-fallback.js"></script>
+</body>
+</html>

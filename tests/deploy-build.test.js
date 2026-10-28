@@ -23,6 +23,9 @@ test("deploy build creates a publishable dist without History exposure", () => {
   assert.ok(fs.existsSync(path.join(distRoot, "data", "versions.json")));
   assert.equal(fs.existsSync(path.join(distRoot, "History")), false);
 
+  assert.ok(fs.existsSync(path.join(distRoot, "au", "index.html")));
+  assert.ok(fs.existsSync(path.join(distRoot, "assets", "au-calculator.js")));
+  assert.match(readDistFile("au", "index.html"), /Amazon AU/);
   const naRoute = readDistFile("na", "index.html");
   const euRoute = readDistFile("eu-uk", "index.html");
   const walmartRoute = readDistFile("walmart", "index.html");

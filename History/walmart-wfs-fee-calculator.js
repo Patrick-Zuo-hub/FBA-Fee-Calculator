@@ -452,6 +452,7 @@
   }
 
   function bindProfitEstimator() {
+    window.layoutFeeWorkspace?.();
     const syncButton = document.getElementById("profitSyncButton");
     const calculateButton = document.getElementById("profitCalculateButton");
     if (!syncButton || !calculateButton) return;
@@ -683,6 +684,7 @@
 
   function calculate({ saveHistory = false } = {}) {
     const input = collectInput();
+    updateTierHighlight();
     if (!validateInput(input)) {
       dom.lastResultView = null;
       dom.profitResult = null;
@@ -751,6 +753,22 @@
     calculate();
   }
 
+  function updateTierHighlight() {
+    if(typeof document.querySelectorAll!=="function")return;
+    const cards=Array.from(document.querySelectorAll('.guide-grid .guide-item'));
+    let tier=null;
+    try { const input=collectInput(); if([input.lengthIn,input.widthIn,input.heightIn,input.unitWeightLb].every(n=>Number.isFinite(n)&&n>0))tier=classifyItem(input); } catch(e) {}
+    const normalize=value=>String(value).toLowerCase().replace(/[^a-z0-9]/g,'');
+    const label=tier?normalize(tier.sizeLabel):'';
+    for(const card of cards){
+      const name=normalize(card.querySelector('strong')?.textContent||'');
+      const selected=!!label&&(label===name||name==='extralarge'&&label.startsWith('extralarge'))||!!tier&&((name==='oversize1'&&tier.oversizeTier==='oversize_1')||(name==='oversize2'&&tier.oversizeTier==='oversize_2'));
+      card.classList.toggle('is-current-tier',selected);
+      card.querySelector('.current-tier-label')?.remove();
+      if(selected){const marker=document.createElement('div');marker.className='current-tier-label';marker.textContent='当前输入所在层级';card.querySelector('strong')?.after(marker);}
+    }
+  }
+
   function bindDom() {
     dom.form = document.getElementById("wfs-fee-form");
     dom.result = document.getElementById("result-root");
@@ -776,6 +794,9 @@
     }
     renderEmptyState("先输入尺寸、重量和售价，然后点击“计算 WFS 费用”。");
 
+    dom.form.addEventListener("input", updateTierHighlight);
+    dom.form.addEventListener("change", updateTierHighlight);
+    updateTierHighlight();
     dom.form.addEventListener("submit", (event) => {
       event.preventDefault();
       calculate({ saveHistory: true });
