@@ -15,7 +15,7 @@
         try{await script('https://cdn.jsdelivr.net/npm/'+file,name);}catch(e){await script('https://unpkg.com/'+file,name);}
       }
       const embedded=document.body.dataset.antEmbedded==='true';
-      await script(new URL(embedded?'ant-legacy.js?v=20261028f':'ant-app.js?v=20261028f',base).href);
+      await script(new URL(embedded?'ant-legacy.js?v=20261030profit':'ant-app.js?v=20261030profit',base).href);
     }catch(error){
       const notice=document.createElement('p');notice.className='site-notice';notice.setAttribute('role','status');
       notice.textContent='Ant Design 组件暂未加载成功，已显示基础计算页面。请检查网络后刷新。';document.body.prepend(notice);

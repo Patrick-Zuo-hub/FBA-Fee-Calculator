@@ -103,7 +103,7 @@
       h(Space,{style:{marginBottom:20}},
         h(Button,{onClick:()=>{frame?.contentDocument.querySelector('form')?.requestSubmit();refreshCount();}},'保存本次测算'),
         h(Button,{onClick:()=>frame?.contentDocument.querySelector('.fba-history-trigger')?.click()},'历史记录 ('+count+')')),
-      h('div',{className:'calculator-container'},h('iframe',{src:embedSrc+'?ui=20261028e',title:label+' 费用与利润计算器',className:'ant-calculator-frame',onLoad:event=>{
+      h('div',{className:'calculator-container'},h('iframe',{src:embedSrc+'?ui=20261030profit',title:label+' 费用与利润计算器',className:'ant-calculator-frame',onLoad:event=>{
         const iframe=event.currentTarget;setFrame(iframe);refreshCount();
         try{iframe.contentDocument.body.classList.add('workspace-history-external');const resize=()=>{iframe.style.height=iframe.contentDocument.documentElement.scrollHeight+'px';};new iframe.contentWindow.ResizeObserver(resize).observe(iframe.contentDocument.body);resize();}catch(e){}
       }})));

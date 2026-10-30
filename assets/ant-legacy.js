@@ -48,12 +48,22 @@
       const right=workspace.lastElementChild;right.classList.add('workspace-results');
       const title=right.querySelector('h2');if(title)title.textContent='单件费用';
     }
+    let leftColumn=inputPanel.parentElement;
+    if(leftColumn===workspace){
+      leftColumn=document.createElement('div');leftColumn.className='stack workspace-input-column';
+      workspace.insertBefore(leftColumn,inputPanel);leftColumn.append(inputPanel);
+    }
+    let profitSlot=leftColumn.querySelector('.workspace-profit-slot');
+    if(!profitSlot){
+      profitSlot=document.createElement('div');profitSlot.className='workspace-profit-slot';
+      inputPanel.insertAdjacentElement('afterend',profitSlot);
+    }
     const pane=inputPanel.querySelector('.workspace-profit-input');
     const fresh=result.querySelector('.profit-estimator');
     if(fresh&&fresh!==profitSource){
       pane.replaceChildren();profitSource=fresh;
       const output=fresh.querySelector('.profit-result-card');
-      if(output){output.classList.add('workspace-profit-output');result.append(output);}
+      if(output){output.classList.add('workspace-profit-output');profitSlot.replaceChildren(output);}else{profitSlot.replaceChildren();}
       pane.append(fresh);
     }
     for(const child of inputPanel.children){

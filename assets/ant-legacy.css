@@ -97,3 +97,13 @@ input:focus,select:focus { border-color:#e76059; box-shadow:0 0 0 2px #d92d2714;
 .workspace-history-external .fba-history-trigger { display:none!important; }
 .guide-item.is-current-tier { border:1px solid #d92d27; background:#fff2f0; box-shadow:inset 0 0 0 1px #d92d27; }
 .current-tier-label { color:#d92d27; font-size:13px; font-weight:600; margin:8px 0; }
+
+/* Keep profit beside the working form, above the long fee explanations. */
+.workspace-profit-slot:empty { display:none; }
+.workspace-profit-slot .workspace-profit-output { margin:0; width:100%; }
+.workspace-profit-slot .profit-result-card__label { display:block; }
+.workspace-profit-slot .profit-result-card { color:#262626; }
+.workspace-profit-slot .profit-result-card__label,
+.workspace-profit-slot .profit-result-card__hint,
+.workspace-profit-slot .profit-result-card__message { color:#8c8c8c; opacity:1; }
+.workspace-profit-slot .profit-result-card__message { border-top-color:#f0f0f0; }
