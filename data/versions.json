@@ -2,8 +2,8 @@
   "na": {
     "name": "Amazon NA",
     "route": "/na/",
-    "updatedAt": "2026-07-08",
-    "status": "2026 peak fulfilment fee toggle available for US/CA",
+    "updatedAt": "2026-11-06",
+    "status": "US: 2027 non-peak default / 2026 peak toggle; CA and MX unchanged",
     "coverage": "US / CA / MX"
   },
   "eu-uk": {
@@ -21,6 +21,12 @@
     "coverage": "Walmart US"
   },
   "homepageUpdates": [
+    {
+      "date": "2026-11-06",
+      "module": "na",
+      "title": "US 2027 FBA fees",
+      "summary": "US defaults to 2027 non-peak fees, with a 2026 peak toggle, new size tiers and handling fees. Canada and Mexico are unchanged."
+    },
     {
       "date": "2026-10-28",
       "module": "au",
@@ -53,6 +59,12 @@
     }
   ],
   "updates": [
+    {
+      "date": "2026-11-06",
+      "module": "na",
+      "title": "US 2027 FBA fees",
+      "summary": "US defaults to 2027 non-peak fees, with a 2026 peak toggle, new size tiers and handling fees. Canada and Mexico are unchanged."
+    },
     {
       "date": "2026-10-28",
       "module": "au",

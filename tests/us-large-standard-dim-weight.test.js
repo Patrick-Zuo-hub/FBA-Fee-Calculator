@@ -131,7 +131,7 @@ function createUsHarness() {
   return { elements };
 }
 
-test("US Large standard-size uses actual dimensions by default and 2-inch minimum when enabled", () => {
+test("US Large standard-size uses verified actual dimensions even with a legacy 2-inch flag", () => {
   const { elements } = createUsHarness();
 
   elements.length.value = "16";
@@ -151,7 +151,7 @@ test("US Large standard-size uses actual dimensions by default and 2-inch minimu
   const withMinimumMarkup = elements["result-root"].innerHTML;
 
   assert.match(withMinimumMarkup, /Large standard-size/);
-  assert.match(withMinimumMarkup, /dimensional weight; dimensional weight 2\.07 lb/);
+  assert.match(withMinimumMarkup, /unit weight; dimensional weight 0\.52 lb/);
 });
 
 test("US bulky tiers keep the 2-inch minimum regardless of the Large standard toggle", () => {
@@ -170,8 +170,8 @@ test("US bulky tiers keep the 2-inch minimum regardless of the Large standard to
   elements["us-fee-form"].listeners.submit({ preventDefault() {} });
   const withMinimumMarkup = elements["result-root"].innerHTML;
 
-  assert.match(withoutMinimumMarkup, /Small Bulky/);
+  assert.match(withoutMinimumMarkup, /Small bulky/);
   assert.match(withoutMinimumMarkup, /dimensional weight; dimensional weight 4\.32 lb/);
-  assert.match(withMinimumMarkup, /Small Bulky/);
+  assert.match(withMinimumMarkup, /Small bulky/);
   assert.match(withMinimumMarkup, /dimensional weight; dimensional weight 4\.32 lb/);
 });

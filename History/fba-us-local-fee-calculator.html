@@ -697,7 +697,7 @@
   <script defer src="./profit-estimator.js?v=20261030profit"></script>
   <script defer src="./fba-surcharge-rules.js"></script>
   <script defer src="./fba-history.js"></script>
-  <script defer src="./fba-us-local-fee-calculator.js?v=20261030profit"></script>
+  <script defer src="./fba-us-local-fee-calculator.js?v=20261106us2027"></script>
   <link rel="stylesheet" href="../assets/ant-legacy.css?v=20261030profit2" />
   <script defer src="../assets/ant-loader.js?v=20261030profit"></script>
 </head>
@@ -724,7 +724,7 @@
           </div>
           <div class="mini-card">
             <span>生效日期</span>
-            <strong>US / CA 2026+</strong>
+            <strong>US 2027／2026旺季</strong>
           </div>
           <div class="mini-card">
             <span>尺寸层级</span>
@@ -736,10 +736,10 @@
           </div>
         </div>
         <ul class="hero-list">
-          <li>US 保留 `non-apparel`、`apparel`、`dangerous goods` 三套 2026 非旺季费率。</li>
+          <li>US 保留 `non-apparel`、`apparel`、`dangerous goods` 三套2027非旺季及2026旺季费率。</li>
           <li>CA 支持 `Envelope / Standard / Oversize` 以及对应的 SIPP discount。</li>
           <li>MX 支持 3 套费率组、含 VAT 售价带与 SIPP discount。</li>
-          <li>US 会继续计算 `low-inventory-level fee`、`Overmax` 与 bulky `packaging fee`。</li>
+          <li>US 支持2027 Flat／Overhang、Bulky包装费与可选低库存估算；2026旺季使用旧Overmax。</li>
         </ul>
       </aside>
     </section>
@@ -838,12 +838,12 @@
             <label class="toggle">
               <input id="peakFulfillmentFees" name="peakFulfillmentFees" type="checkbox" />
               <div>
-                <strong>2026 旺季 FBA 基础费</strong>
-                <span>手动勾选后，US / CA 会按 2026-10-15 至 2027-01-14 的 Peak fulfilment fee 表替换基础履约费；未勾选则保持当前非旺季费率。</span>
+                <strong>使用 2026 旺季费用</strong>
+                <span id="peak-mode-hint">美国站默认2027/1/15–10/14非旺季；勾选切换2026/10/15–2027/1/14旺季。加拿大和墨西哥保持原规则。</span>
               </div>
             </label>
 
-            <label class="toggle">
+            <label class="toggle" hidden>
               <input id="largeStandardDimMinimum" name="largeStandardDimMinimum" type="checkbox" />
               <div>
                 <strong>Large standard-size 次长边 / 最短边按至少 2 inch 计算</strong>
@@ -860,6 +860,10 @@
             </label>
           </div>
 
+          <label class="toggle" id="low-price-condition" hidden>
+            <input id="lowPriceExcluded" name="lowPriceExcluded" type="checkbox" />
+            <div><strong>属于不享受2027低价费率的收费品类</strong><span>Automotive and Powersports、Compact Appliances、Computers、Musical Instruments and AV Production、Media（Books/DVD/Music/Software/Video）。售价低于$10时按$10–$50费率计算。</span></div>
+          </label>
           <section class="guide-card">
             <div class="guide-head">
               <h3 id="size-tier-guide-title">当前站点 Size Tier</h3>
@@ -869,13 +873,19 @@
           </section>
 
           <div id="us-only-section">
+            <h3 class="subsection-heading">低库存费情景估算（选填）</h3>
+            <p id="low-inventory-hint">2027/2/1起规则；未填写DOS时未估算，非确定免收。</p>
+            <label class="toggle" id="no-shipments-condition">
+              <input id="noTrailingShipments" name="noTrailingShipments" type="checkbox" />
+              <div><strong>前／后28天任一窗口没有出货</strong><span>该情形不收2027低库存费；DOS为0不自动代表没有出货。</span></div>
+            </label>
             <div class="double">
               <div class="field">
-                <label for="longTermDos">Long-term historical days of supply（90 天）</label>
+                <label for="longTermDos" id="long-dos-label">评估日前28天 DOS（2027/2/1起）</label>
                 <input id="longTermDos" name="longTermDos" type="number" min="0" step="0.1" placeholder="仅 US 用于 low-inventory-level fee" />
               </div>
               <div class="field">
-                <label for="shortTermDos">Short-term historical days of supply（30 天）</label>
+                <label for="shortTermDos" id="short-dos-label">评估日后28天 DOS（实际或预测）</label>
                 <input id="shortTermDos" name="shortTermDos" type="number" min="0" step="0.1" placeholder="仅 US 用于 low-inventory-level fee" />
               </div>
             </div>
@@ -900,8 +910,8 @@
               <label class="toggle">
                 <input id="newToFbaExempt" name="newToFbaExempt" type="checkbox" />
                 <div>
-                  <strong>New-to-FBA 前 180 天且符合 FBA New Selection</strong>
-                  <span>按 PDF FAQ 视为 low-inventory fee 豁免。</span>
+                  <strong id="new-fba-label">New-to-FBA 前120天／首200件且符合 New Selection</strong>
+                  <span>仅在符合当前版本的新商品豁免条件时勾选。</span>
                 </div>
               </label>
 
@@ -916,7 +926,7 @@
               <label class="toggle">
                 <input id="slowMoverExempt" name="slowMoverExempt" type="checkbox" />
                 <div>
-                  <strong>过去 7 天销量少于 20 件</strong>
+                  <strong>过去 7 天出货少于 20 件</strong>
                   <span>慢销 SKU 免 low-inventory-level fee。</span>
                 </div>
               </label>
@@ -924,7 +934,7 @@
           </div>
 
           <div class="tiny">
-            本页只按你提供的北美站 PDF 实现当前规则；欧洲页仍保持独立，不与本页混用。
+            美国站规则核对：2026-11-06；使用亚马逊2027非旺季／2026旺季官方费率。加拿大、墨西哥保持既有规则。
           </div>
         </form>
       </section>

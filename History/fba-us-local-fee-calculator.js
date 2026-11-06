@@ -530,6 +530,614 @@
     }
   };
 
+  // Seller Central GABBX6GZPA8MSZGW, verified 2026-11-06; table rates exclude fuel surcharge.
+  const US_FEE_CARDS = {
+  "regular2027": {
+    "non_apparel": {
+      "smallStandard": [
+        { "maxOz": 2, "under10": 2.64, "band10to50": 3.75, "over50": 4.31 },
+        { "maxOz": 4, "under10": 2.72, "band10to50": 3.78, "over50": 4.34 },
+        { "maxOz": 6, "under10": 2.8, "band10to50": 3.92, "over50": 4.47 },
+        { "maxOz": 8, "under10": 2.83, "band10to50": 3.97, "over50": 4.53 },
+        { "maxOz": 10, "under10": 2.87, "band10to50": 4.06, "over50": 4.62 },
+        { "maxOz": 12, "under10": 2.92, "band10to50": 4.16, "over50": 4.73 },
+        { "maxOz": 14, "under10": 2.96, "band10to50": 4.3, "over50": 4.85 },
+        { "maxOz": 16, "under10": 2.99, "band10to50": 4.32, "over50": 4.88 }
+      ],
+      "largeStandardBands": [
+        { "maxLb": 0.25, "label": "4 oz or less", "under10": 2.91, "band10to50": 3.79, "over50": 4.35 },
+        { "maxLb": 0.5, "label": "4+ to 8 oz", "under10": 3.13, "band10to50": 4.01, "over50": 4.57 },
+        { "maxLb": 0.75, "label": "8+ to 12 oz", "under10": 3.38, "band10to50": 4.26, "over50": 4.83 },
+        { "maxLb": 1.0, "label": "12+ to 16 oz", "under10": 3.78, "band10to50": 4.67, "over50": 5.23 },
+        { "maxLb": 1.25, "label": "1+ to 1.25 lb", "under10": 4.22, "band10to50": 5.19, "over50": 5.75 },
+        { "maxLb": 1.5, "label": "1.25+ to 1.5 lb", "under10": 4.6, "band10to50": 5.57, "over50": 6.14 },
+        { "maxLb": 1.75, "label": "1.5+ to 1.75 lb", "under10": 4.75, "band10to50": 5.72, "over50": 6.29 },
+        { "maxLb": 2.0, "label": "1.75+ to 2 lb", "under10": 5.0, "band10to50": 5.98, "over50": 6.54 },
+        { "maxLb": 2.25, "label": "2+ to 2.25 lb", "under10": 5.1, "band10to50": 6.08, "over50": 6.64 },
+        { "maxLb": 2.5, "label": "2.25+ to 2.5 lb", "under10": 5.28, "band10to50": 6.26, "over50": 6.83 },
+        { "maxLb": 2.75, "label": "2.5+ to 2.75 lb", "under10": 5.44, "band10to50": 6.42, "over50": 6.99 },
+        { "maxLb": 3.0, "label": "2.75+ to 3 lb", "under10": 5.85, "band10to50": 6.85, "over50": 7.41 }
+      ],
+      "largeStandardFormula": {
+        "under10": 6.15,
+        "band10to50": 7.16,
+        "over50": 7.73,
+        "increment": 0.08,
+        "thresholdLb": 3,
+        "stepLb": 0.25
+      },
+      "formulas": {
+        "small_bulky": {
+          "under10": 6.73,
+          "band10to50": 7.51,
+          "over50": 7.51,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "medium_bulky": {
+          "under10": 6.88,
+          "band10to50": 7.66,
+          "over50": 7.66,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "large_bulky": {
+          "under10": 9.09,
+          "band10to50": 9.88,
+          "over50": 9.88,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "extra_large_bulky": {
+          "under10": 9.31,
+          "band10to50": 10.09,
+          "over50": 10.09,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "small_oversize": {
+          "under10": 13.44,
+          "band10to50": 14.22,
+          "over50": 14.22,
+          "increment": 0.28,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "medium_oversize": {
+          "under10": 27.36,
+          "band10to50": 28.15,
+          "over50": 28.15,
+          "increment": 0.56,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "large_oversize": {
+          "under10": 37.97,
+          "band10to50": 38.75,
+          "over50": 38.75,
+          "increment": 0.68,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "long_oversize": {
+          "under10": 62.97,
+          "band10to50": 63.75,
+          "over50": 63.75,
+          "increment": 0.3,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "special_oversize_light": {
+          "under10": 71.09,
+          "band10to50": 71.87,
+          "over50": 71.87,
+          "increment": 0.3,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "special_oversize_heavy": {
+          "under10": 190.5,
+          "band10to50": 191.28,
+          "over50": 191.28,
+          "increment": 0.19,
+          "thresholdLb": 151,
+          "stepLb": 1
+        }
+      }
+    },
+    "apparel": {
+      "smallStandard": [
+        { "maxOz": 2, "under10": 2.83, "band10to50": 3.92, "over50": 4.54 },
+        { "maxOz": 4, "under10": 2.85, "band10to50": 3.95, "over50": 4.57 },
+        { "maxOz": 6, "under10": 2.9, "band10to50": 4.01, "over50": 4.62 },
+        { "maxOz": 8, "under10": 3.03, "band10to50": 4.11, "over50": 4.72 },
+        { "maxOz": 10, "under10": 3.17, "band10to50": 4.25, "over50": 4.74 },
+        { "maxOz": 12, "under10": 3.27, "band10to50": 4.43, "over50": 4.92 },
+        { "maxOz": 14, "under10": 3.38, "band10to50": 4.55, "over50": 5.03 },
+        { "maxOz": 16, "under10": 3.48, "band10to50": 4.6, "over50": 5.08 }
+      ],
+      "largeStandardBands": [
+        { "maxLb": 0.25, "label": "4 oz or less", "under10": 3.53, "band10to50": 4.36, "over50": 4.93 },
+        { "maxLb": 0.5, "label": "4+ to 8 oz", "under10": 3.74, "band10to50": 4.57, "over50": 5.13 },
+        { "maxLb": 0.75, "label": "8+ to 12 oz", "under10": 3.96, "band10to50": 4.79, "over50": 5.35 },
+        { "maxLb": 1.0, "label": "12+ to 16 oz", "under10": 4.42, "band10to50": 5.25, "over50": 5.81 },
+        { "maxLb": 1.25, "label": "1+ to 1.25 lb", "under10": 5.13, "band10to50": 5.96, "over50": 6.52 },
+        { "maxLb": 1.5, "label": "1.25+ to 1.5 lb", "under10": 5.3, "band10to50": 6.13, "over50": 6.69 },
+        { "maxLb": 1.75, "label": "1.5+ to 1.75 lb", "under10": 5.4, "band10to50": 6.23, "over50": 6.8 },
+        { "maxLb": 2.0, "label": "1.75+ to 2 lb", "under10": 5.51, "band10to50": 6.34, "over50": 6.91 },
+        { "maxLb": 2.25, "label": "2+ to 2.25 lb", "under10": 5.87, "band10to50": 6.7, "over50": 7.26 },
+        { "maxLb": 2.5, "label": "2.25+ to 2.5 lb", "under10": 5.99, "band10to50": 6.82, "over50": 7.38 },
+        { "maxLb": 2.75, "label": "2.5+ to 2.75 lb", "under10": 6.04, "band10to50": 6.87, "over50": 7.44 },
+        { "maxLb": 3.0, "label": "2.75+ to 3 lb", "under10": 6.17, "band10to50": 7.0, "over50": 7.57 }
+      ],
+      "largeStandardFormula": {
+        "under10": 6.24,
+        "band10to50": 7.07,
+        "over50": 7.64,
+        "increment": 0.16,
+        "thresholdLb": 3,
+        "stepLb": 0.5
+      },
+      "formulas": {
+        "small_bulky": {
+          "under10": 6.73,
+          "band10to50": 7.51,
+          "over50": 7.51,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "medium_bulky": {
+          "under10": 6.88,
+          "band10to50": 7.66,
+          "over50": 7.66,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "large_bulky": {
+          "under10": 9.09,
+          "band10to50": 9.88,
+          "over50": 9.88,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "extra_large_bulky": {
+          "under10": 9.31,
+          "band10to50": 10.09,
+          "over50": 10.09,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "small_oversize": {
+          "under10": 13.44,
+          "band10to50": 14.22,
+          "over50": 14.22,
+          "increment": 0.28,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "medium_oversize": {
+          "under10": 27.36,
+          "band10to50": 28.15,
+          "over50": 28.15,
+          "increment": 0.56,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "large_oversize": {
+          "under10": 37.97,
+          "band10to50": 38.75,
+          "over50": 38.75,
+          "increment": 0.68,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "long_oversize": {
+          "under10": 62.97,
+          "band10to50": 63.75,
+          "over50": 63.75,
+          "increment": 0.3,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "special_oversize_light": {
+          "under10": 71.09,
+          "band10to50": 71.87,
+          "over50": 71.87,
+          "increment": 0.3,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "special_oversize_heavy": {
+          "under10": 190.5,
+          "band10to50": 191.28,
+          "over50": 191.28,
+          "increment": 0.19,
+          "thresholdLb": 151,
+          "stepLb": 1
+        }
+      }
+    },
+    "dangerous_goods": {
+      "smallStandard": [
+        { "maxOz": 2, "under10": 3.57, "band10to50": 4.59, "over50": 5.15 },
+        { "maxOz": 4, "under10": 3.62, "band10to50": 4.61, "over50": 5.17 },
+        { "maxOz": 6, "under10": 3.69, "band10to50": 4.75, "over50": 5.32 },
+        { "maxOz": 8, "under10": 3.71, "band10to50": 4.8, "over50": 5.37 },
+        { "maxOz": 10, "under10": 3.74, "band10to50": 4.88, "over50": 5.45 },
+        { "maxOz": 12, "under10": 3.75, "band10to50": 4.97, "over50": 5.54 },
+        { "maxOz": 14, "under10": 3.79, "band10to50": 5.01, "over50": 5.57 },
+        { "maxOz": 16, "under10": 3.83, "band10to50": 5.04, "over50": 5.6 }
+      ],
+      "largeStandardBands": [
+        { "maxLb": 0.25, "label": "4 oz or less", "under10": 3.73, "band10to50": 4.62, "over50": 5.18 },
+        { "maxLb": 0.5, "label": "4+ to 8 oz", "under10": 3.94, "band10to50": 4.83, "over50": 5.4 },
+        { "maxLb": 0.75, "label": "8+ to 12 oz", "under10": 4.17, "band10to50": 5.06, "over50": 5.63 },
+        { "maxLb": 1.0, "label": "12+ to 16 oz", "under10": 4.37, "band10to50": 5.27, "over50": 5.83 },
+        { "maxLb": 1.25, "label": "1+ to 1.25 lb", "under10": 4.82, "band10to50": 5.79, "over50": 6.36 },
+        { "maxLb": 1.5, "label": "1.25+ to 1.5 lb", "under10": 5.2, "band10to50": 6.18, "over50": 6.74 },
+        { "maxLb": 1.75, "label": "1.5+ to 1.75 lb", "under10": 5.35, "band10to50": 6.33, "over50": 6.9 },
+        { "maxLb": 2.0, "label": "1.75+ to 2 lb", "under10": 5.49, "band10to50": 6.47, "over50": 7.04 },
+        { "maxLb": 2.25, "label": "2+ to 2.25 lb", "under10": 5.56, "band10to50": 6.55, "over50": 7.11 },
+        { "maxLb": 2.5, "label": "2.25+ to 2.5 lb", "under10": 5.74, "band10to50": 6.73, "over50": 7.29 },
+        { "maxLb": 2.75, "label": "2.5+ to 2.75 lb", "under10": 5.9, "band10to50": 6.89, "over50": 7.45 },
+        { "maxLb": 3.0, "label": "2.75+ to 3 lb", "under10": 6.31, "band10to50": 7.32, "over50": 7.88 }
+      ],
+      "largeStandardFormula": {
+        "under10": 6.61,
+        "band10to50": 7.63,
+        "over50": 8.2,
+        "increment": 0.08,
+        "thresholdLb": 3,
+        "stepLb": 0.25
+      },
+      "formulas": {
+        "small_bulky": {
+          "under10": 7.46,
+          "band10to50": 8.24,
+          "over50": 8.24,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "medium_bulky": {
+          "under10": 7.61,
+          "band10to50": 8.39,
+          "over50": 8.39,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "large_bulky": {
+          "under10": 9.83,
+          "band10to50": 10.61,
+          "over50": 10.61,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "extra_large_bulky": {
+          "under10": 10.04,
+          "band10to50": 10.82,
+          "over50": 10.82,
+          "increment": 0.39,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "small_oversize": {
+          "under10": 15.58,
+          "band10to50": 16.36,
+          "over50": 16.36,
+          "increment": 0.28,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "medium_oversize": {
+          "under10": 30.62,
+          "band10to50": 31.4,
+          "over50": 31.4,
+          "increment": 0.56,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "large_oversize": {
+          "under10": 45.21,
+          "band10to50": 45.99,
+          "over50": 45.99,
+          "increment": 0.68,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "long_oversize": {
+          "under10": 70.21,
+          "band10to50": 70.99,
+          "over50": 70.99,
+          "increment": 0.3,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "special_oversize_light": {
+          "under10": 78.33,
+          "band10to50": 79.11,
+          "over50": 79.11,
+          "increment": 0.3,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "special_oversize_heavy": {
+          "under10": 215.44,
+          "band10to50": 216.23,
+          "over50": 216.23,
+          "increment": 0.19,
+          "thresholdLb": 151,
+          "stepLb": 1
+        }
+      }
+    }
+  },
+  "peak2026": {
+    "non_apparel": {
+      "smallStandard": [
+        { "maxOz": 2, "under10": 2.62, "band10to50": 3.51, "over50": 3.77 },
+        { "maxOz": 4, "under10": 2.68, "band10to50": 3.61, "over50": 3.87 },
+        { "maxOz": 6, "under10": 2.76, "band10to50": 3.65, "over50": 3.91 },
+        { "maxOz": 8, "under10": 2.86, "band10to50": 3.74, "over50": 4.0 },
+        { "maxOz": 10, "under10": 2.98, "band10to50": 3.89, "over50": 4.15 },
+        { "maxOz": 12, "under10": 3.03, "band10to50": 3.99, "over50": 4.25 },
+        { "maxOz": 14, "under10": 3.14, "band10to50": 4.13, "over50": 4.39 },
+        { "maxOz": 16, "under10": 3.17, "band10to50": 4.18, "over50": 4.44 }
+      ],
+      "largeStandardBands": [
+        { "maxLb": 0.25, "label": "4 oz or less", "under10": 3.15, "band10to50": 3.97, "over50": 4.23 },
+        { "maxLb": 0.5, "label": "4+ to 8 oz", "under10": 3.39, "band10to50": 4.21, "over50": 4.47 },
+        { "maxLb": 0.75, "label": "8+ to 12 oz", "under10": 3.66, "band10to50": 4.48, "over50": 4.74 },
+        { "maxLb": 1.0, "label": "12+ to 16 oz", "under10": 4.07, "band10to50": 4.89, "over50": 5.15 },
+        { "maxLb": 1.25, "label": "1+ to 1.25 lb", "under10": 4.52, "band10to50": 5.34, "over50": 5.6 },
+        { "maxLb": 1.5, "label": "1.25+ to 1.5 lb", "under10": 4.91, "band10to50": 5.73, "over50": 5.99 },
+        { "maxLb": 1.75, "label": "1.5+ to 1.75 lb", "under10": 5.07, "band10to50": 5.89, "over50": 6.15 },
+        { "maxLb": 2.0, "label": "1.75+ to 2 lb", "under10": 5.33, "band10to50": 6.15, "over50": 6.41 },
+        { "maxLb": 2.25, "label": "2+ to 2.25 lb", "under10": 5.47, "band10to50": 6.29, "over50": 6.55 },
+        { "maxLb": 2.5, "label": "2.25+ to 2.5 lb", "under10": 5.67, "band10to50": 6.49, "over50": 6.75 },
+        { "maxLb": 2.75, "label": "2.5+ to 2.75 lb", "under10": 5.84, "band10to50": 6.66, "over50": 6.92 },
+        { "maxLb": 3.0, "label": "2.75+ to 3 lb", "under10": 6.26, "band10to50": 7.08, "over50": 7.34 }
+      ],
+      "largeStandardFormula": {
+        "under10": 6.69,
+        "band10to50": 7.51,
+        "over50": 7.77,
+        "increment": 0.08,
+        "thresholdLb": 3,
+        "stepLb": 0.25
+      },
+      "formulas": {
+        "small_bulky": {
+          "under10": 7.82,
+          "band10to50": 8.59,
+          "over50": 8.59,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "large_bulky": {
+          "under10": 9.62,
+          "band10to50": 10.39,
+          "over50": 10.39,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "xl_0_50": {
+          "under10": 28.29,
+          "band10to50": 29.06,
+          "over50": 29.06,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "xl_50_70": {
+          "under10": 39.36,
+          "band10to50": 40.13,
+          "over50": 40.13,
+          "increment": 0.75,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "xl_70_150": {
+          "under10": 54.97,
+          "band10to50": 55.74,
+          "over50": 55.74,
+          "increment": 0.75,
+          "thresholdLb": 71,
+          "stepLb": 1
+        },
+        "xl_150_plus": {
+          "under10": 202.69,
+          "band10to50": 203.46,
+          "over50": 203.46,
+          "increment": 0.19,
+          "thresholdLb": 151,
+          "stepLb": 1
+        }
+      }
+    },
+    "apparel": {
+      "smallStandard": [
+        { "maxOz": 2, "under10": 2.85, "band10to50": 3.74, "over50": 4.0 },
+        { "maxOz": 4, "under10": 2.87, "band10to50": 3.77, "over50": 4.03 },
+        { "maxOz": 6, "under10": 2.93, "band10to50": 3.84, "over50": 4.1 },
+        { "maxOz": 8, "under10": 3.06, "band10to50": 3.94, "over50": 4.2 },
+        { "maxOz": 10, "under10": 3.27, "band10to50": 4.18, "over50": 4.44 },
+        { "maxOz": 12, "under10": 3.37, "band10to50": 4.36, "over50": 4.62 },
+        { "maxOz": 14, "under10": 3.49, "band10to50": 4.49, "over50": 4.75 },
+        { "maxOz": 16, "under10": 3.59, "band10to50": 4.54, "over50": 4.8 }
+      ],
+      "largeStandardBands": [
+        { "maxLb": 0.25, "label": "4 oz or less", "under10": 3.79, "band10to50": 4.61, "over50": 4.87 },
+        { "maxLb": 0.5, "label": "4+ to 8 oz", "under10": 4.0, "band10to50": 4.82, "over50": 5.08 },
+        { "maxLb": 0.75, "label": "8+ to 12 oz", "under10": 4.23, "band10to50": 5.05, "over50": 5.31 },
+        { "maxLb": 1.0, "label": "12+ to 16 oz", "under10": 4.69, "band10to50": 5.51, "over50": 5.77 },
+        { "maxLb": 1.25, "label": "1+ to 1.25 lb", "under10": 5.42, "band10to50": 6.24, "over50": 6.5 },
+        { "maxLb": 1.5, "label": "1.25+ to 1.5 lb", "under10": 5.59, "band10to50": 6.41, "over50": 6.67 },
+        { "maxLb": 1.75, "label": "1.5+ to 1.75 lb", "under10": 5.71, "band10to50": 6.53, "over50": 6.79 },
+        { "maxLb": 2.0, "label": "1.75+ to 2 lb", "under10": 5.82, "band10to50": 6.64, "over50": 6.9 },
+        { "maxLb": 2.25, "label": "2+ to 2.25 lb", "under10": 6.22, "band10to50": 7.04, "over50": 7.3 },
+        { "maxLb": 2.5, "label": "2.25+ to 2.5 lb", "under10": 6.34, "band10to50": 7.16, "over50": 7.42 },
+        { "maxLb": 2.75, "label": "2.5+ to 2.75 lb", "under10": 6.41, "band10to50": 7.23, "over50": 7.49 },
+        { "maxLb": 3.0, "label": "2.75+ to 3 lb", "under10": 6.54, "band10to50": 7.36, "over50": 7.62 }
+      ],
+      "largeStandardFormula": {
+        "under10": 6.82,
+        "band10to50": 7.64,
+        "over50": 7.9,
+        "increment": 0.16,
+        "thresholdLb": 3,
+        "stepLb": 0.5
+      },
+      "formulas": {
+        "small_bulky": {
+          "under10": 7.82,
+          "band10to50": 8.59,
+          "over50": 8.59,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "large_bulky": {
+          "under10": 9.62,
+          "band10to50": 10.39,
+          "over50": 10.39,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "xl_0_50": {
+          "under10": 28.29,
+          "band10to50": 29.06,
+          "over50": 29.06,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "xl_50_70": {
+          "under10": 39.36,
+          "band10to50": 40.13,
+          "over50": 40.13,
+          "increment": 0.75,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "xl_70_150": {
+          "under10": 54.97,
+          "band10to50": 55.74,
+          "over50": 55.74,
+          "increment": 0.75,
+          "thresholdLb": 71,
+          "stepLb": 1
+        },
+        "xl_150_plus": {
+          "under10": 202.69,
+          "band10to50": 203.46,
+          "over50": 203.46,
+          "increment": 0.19,
+          "thresholdLb": 151,
+          "stepLb": 1
+        }
+      }
+    },
+    "dangerous_goods": {
+      "smallStandard": [
+        { "maxOz": 2, "under10": 3.74, "band10to50": 4.63, "over50": 4.89 },
+        { "maxOz": 4, "under10": 3.8, "band10to50": 4.73, "over50": 4.99 },
+        { "maxOz": 6, "under10": 3.88, "band10to50": 4.77, "over50": 5.03 },
+        { "maxOz": 8, "under10": 3.98, "band10to50": 4.86, "over50": 5.12 },
+        { "maxOz": 10, "under10": 4.1, "band10to50": 5.01, "over50": 5.27 },
+        { "maxOz": 12, "under10": 4.14, "band10to50": 5.1, "over50": 5.36 },
+        { "maxOz": 14, "under10": 4.25, "band10to50": 5.24, "over50": 5.5 },
+        { "maxOz": 16, "under10": 4.32, "band10to50": 5.33, "over50": 5.59 }
+      ],
+      "largeStandardBands": [
+        { "maxLb": 0.25, "label": "4 oz or less", "under10": 4.32, "band10to50": 5.14, "over50": 5.4 },
+        { "maxLb": 0.5, "label": "4+ to 8 oz", "under10": 4.56, "band10to50": 5.38, "over50": 5.64 },
+        { "maxLb": 0.75, "label": "8+ to 12 oz", "under10": 4.82, "band10to50": 5.64, "over50": 5.9 },
+        { "maxLb": 1.0, "label": "12+ to 16 oz", "under10": 5.04, "band10to50": 5.86, "over50": 6.12 },
+        { "maxLb": 1.25, "label": "1+ to 1.25 lb", "under10": 5.51, "band10to50": 6.33, "over50": 6.59 },
+        { "maxLb": 1.5, "label": "1.25+ to 1.5 lb", "under10": 5.91, "band10to50": 6.73, "over50": 6.99 },
+        { "maxLb": 1.75, "label": "1.5+ to 1.75 lb", "under10": 6.08, "band10to50": 6.9, "over50": 7.16 },
+        { "maxLb": 2.0, "label": "1.75+ to 2 lb", "under10": 6.24, "band10to50": 7.06, "over50": 7.32 },
+        { "maxLb": 2.25, "label": "2+ to 2.25 lb", "under10": 6.33, "band10to50": 7.15, "over50": 7.41 },
+        { "maxLb": 2.5, "label": "2.25+ to 2.5 lb", "under10": 6.53, "band10to50": 7.35, "over50": 7.61 },
+        { "maxLb": 2.75, "label": "2.5+ to 2.75 lb", "under10": 6.7, "band10to50": 7.52, "over50": 7.78 },
+        { "maxLb": 3.0, "label": "2.75+ to 3 lb", "under10": 7.12, "band10to50": 7.94, "over50": 8.2 }
+      ],
+      "largeStandardFormula": {
+        "under10": 7.51,
+        "band10to50": 8.33,
+        "over50": 8.59,
+        "increment": 0.08,
+        "thresholdLb": 3,
+        "stepLb": 0.25
+      },
+      "formulas": {
+        "small_bulky": {
+          "under10": 9.06,
+          "band10to50": 9.83,
+          "over50": 9.83,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "large_bulky": {
+          "under10": 10.86,
+          "band10to50": 11.63,
+          "over50": 11.63,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "xl_0_50": {
+          "under10": 31.71,
+          "band10to50": 32.48,
+          "over50": 32.48,
+          "increment": 0.38,
+          "thresholdLb": 1,
+          "stepLb": 1
+        },
+        "xl_50_70": {
+          "under10": 43.86,
+          "band10to50": 44.63,
+          "over50": 44.63,
+          "increment": 0.75,
+          "thresholdLb": 51,
+          "stepLb": 1
+        },
+        "xl_70_150": {
+          "under10": 64.04,
+          "band10to50": 64.81,
+          "over50": 64.81,
+          "increment": 0.75,
+          "thresholdLb": 71,
+          "stepLb": 1
+        },
+        "xl_150_plus": {
+          "under10": 230.84,
+          "band10to50": 231.61,
+          "over50": 231.61,
+          "increment": 0.19,
+          "thresholdLb": 151,
+          "stepLb": 1
+        }
+      }
+    }
+  }
+};
+
   const dom = {};
   const historyApi = globalThis.FBA_HISTORY || {};
 
@@ -712,6 +1320,8 @@
       unitWeightKg: toKilograms(weight, weightUnit),
       fuelLogisticsSurcharge: fd.get("fuelLogisticsSurcharge") === "on",
       peakFulfillmentFees: fd.get("peakFulfillmentFees") === "on",
+      lowPriceExcluded: fd.get("lowPriceExcluded") === "on",
+      noTrailingShipments: fd.get("noTrailingShipments") === "on",
       largeStandardDimMinimum: fd.get("largeStandardDimMinimum") === "on",
       sippCertified: fd.get("sippCertified") === "on",
       longTermDos: fd.get("longTermDos") ? Number(fd.get("longTermDos")) : null,
@@ -745,7 +1355,7 @@
     return (dimsCm[0] * dimsCm[1] * dimsCm[2]) / 5000;
   }
 
-  function classifyUs(input) {
+  function classifyUs2026(input) {
     const dims = sortedDims(input.lengthIn, input.widthIn, input.heightIn);
     const dimWeightLargeStandardLb = input.largeStandardDimMinimum
       ? dimensionalWeightUs(dims)
@@ -910,6 +1520,38 @@
       overmax: false,
       warnings: []
     };
+  }
+
+  function classifyUs(input) {
+    // Large standard uses actual dimensions; the 2-inch minimum is only for bulky/oversize.
+    const legacy = classifyUs2026({ ...input, largeStandardDimMinimum: false });
+    if (input.peakFulfillmentFees || ["small_standard", "large_standard"].includes(legacy.key)) return legacy;
+    const dims = sortedDims(input.lengthIn, input.widthIn, input.heightIn);
+    const lpg = lengthPlusGirth(dims);
+    const dimWeight = dimensionalWeightUs(dims);
+    const shippingWeight = Math.max(input.unitWeightLb, dimWeight);
+    const tiers = [
+      ["small_bulky", "Small bulky", 50, 28, 24, 20, 130],
+      ["medium_bulky", "Medium bulky", 50, 37, 28, 20, 130],
+      ["large_bulky", "Large bulky", 50, 52, 28, 28, 130],
+      ["extra_large_bulky", "Extra-large bulky", 50, 59, 33, 33, 130],
+      ["small_oversize", "Small oversize", 50, 72, Infinity, Infinity, 130],
+      ["medium_oversize", "Medium oversize", 70, 78, Infinity, Infinity, 130],
+      ["large_oversize", "Large oversize", 150, 96, Infinity, Infinity, 130]
+    ];
+    let selected = tiers.find(([, , weight, length, width, height, girth]) => shippingWeight <= weight && dims[0] <= length && dims[1] <= width && dims[2] <= height && lpg <= girth);
+    if (!selected) {
+      // Official Revenue Calculator probes: 108 in OR length+girth 165 in is special light.
+      selected = shippingWeight > 150 ? ["special_oversize_heavy", "Special oversize heavy"]
+        : dims[0] >= 108 - 1e-9 || lpg >= 165 - 1e-9 ? ["special_oversize_light", "Special oversize light"]
+        : ["long_oversize", "Long oversize"];
+    }
+    const heavy = selected[0] === "special_oversize_heavy";
+    return { market: "US", key: selected[0], label: selected[1], dims, dimensionUnit: "in",
+      rawShippingWeight: heavy ? input.unitWeightLb : shippingWeight,
+      feeShippingWeight: heavy ? input.unitWeightLb : shippingWeight, weightUnit: "lb",
+      shippingWeightBasis: heavy || input.unitWeightLb >= dimWeight ? "unit weight" : "dimensional weight",
+      dimWeight, dimWeightUnit: "lb", lengthPlusGirth: lpg, overmax: false, warnings: [] };
   }
 
   function classifyCa(input) {
@@ -1095,100 +1737,25 @@
     return formula[priceBand] + (intervals * formula.increment);
   }
 
+  function usFeeVersion(input) { return input.peakFulfillmentFees ? "peak2026" : "regular2027"; }
+
   function baseFeeUs(input, tier) {
-    const band = priceBandUs(input.price);
-    const peakDetail = `Using 2026 Peak fulfilment fee table for ${PEAK_FULFILLMENT.periodLabel}.`;
-
-    if (input.peakFulfillmentFees && input.category !== "non_apparel") {
-      const base = baseFeeUs({ ...input, peakFulfillmentFees: false }, tier);
-      return withPeakFulfillment(
-        { ...base, peakFulfillment: undefined },
-        input,
-        false,
-        "US peak table is excluding apparel and does not include dangerous goods rows; current base fulfilment fee is kept."
-      );
+    const card = US_FEE_CARDS[usFeeVersion(input)][input.category];
+    const excluded = !input.peakFulfillmentFees && input.lowPriceExcluded && input.price < 10;
+    const price = excluded ? 10 : input.price;
+    let result;
+    if (tier.key === "small_standard") result = smallStandardFeeUs(input.category, price, tier.feeShippingWeight, card.smallStandard);
+    else if (tier.key === "large_standard") result = largeStandardFeeUs(input.category, price, tier.feeShippingWeight, card.largeStandardBands, card.largeStandardFormula);
+    else {
+      const formula = card.formulas[tier.key];
+      result = { amount: intervalFee(formula, priceBandUs(price), tier.feeShippingWeight, formula.thresholdLb, formula.stepLb),
+        bandLabel: `First ${formula.thresholdLb} lb + $${formula.increment.toFixed(2)} per ${formula.stepLb} lb interval` };
     }
-
-    const usePeak = input.peakFulfillmentFees && input.category === "non_apparel";
-    const smallStandardSource = usePeak ? PEAK_FULFILLMENT.us.smallStandard : DATA.us.smallStandard[input.category];
-    const largeStandardBands = usePeak ? PEAK_FULFILLMENT.us.largeStandardBands : DATA.us.largeStandardBands[input.category];
-    const largeStandardFormula = usePeak ? PEAK_FULFILLMENT.us.largeStandardFormula : DATA.us.largeStandardFormula[input.category];
-    const formulaSource = (key) => {
-      if (!usePeak) return DATA.us[key][input.category];
-      return PEAK_FULFILLMENT.us[key];
-    };
-
-    if (tier.key === "small_standard") {
-      const result = smallStandardFeeUs(input.category, input.price, tier.feeShippingWeight, smallStandardSource);
-      return withPeakFulfillment({
-        amount: result.amount,
-        bandLabel: result.bandLabel,
-        explanation: "Small standard-size fees use unit weight only.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    if (tier.key === "large_standard") {
-      const result = largeStandardFeeUs(input.category, input.price, tier.feeShippingWeight, largeStandardBands, largeStandardFormula);
-      return withPeakFulfillment({
-        amount: result.amount,
-        bandLabel: result.bandLabel,
-        explanation: "Large standard-size fees use the greater of unit weight or dimensional weight.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    if (tier.key === "small_bulky") {
-      return withPeakFulfillment({
-        amount: intervalFee(formulaSource("smallBulkyFormula"), band, tier.feeShippingWeight, 1, 1),
-        bandLabel: "0 to 50 lb; billed by 1 lb interval above first lb",
-        explanation: "Small Bulky fees use the greater of unit weight or dimensional weight.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    if (tier.key === "large_bulky") {
-      return withPeakFulfillment({
-        amount: intervalFee(formulaSource("largeBulkyFormula"), band, tier.feeShippingWeight, 1, 1),
-        bandLabel: "0 to 50 lb; billed by 1 lb interval above first lb",
-        explanation: "Large Bulky fees use the greater of unit weight or dimensional weight.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    if (tier.key === "xl_0_50") {
-      return withPeakFulfillment({
-        amount: intervalFee(formulaSource("xl0to50Formula"), band, tier.feeShippingWeight, 1, 1),
-        bandLabel: "0 to 50 lb; billed by 1 lb interval above first lb",
-        explanation: "Extra-Large 0 to 50 lb fees use the greater of unit weight or dimensional weight.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    if (tier.key === "xl_50_70") {
-      return withPeakFulfillment({
-        amount: intervalFee(formulaSource("xl50to70Formula"), band, tier.feeShippingWeight, 51, 1),
-        bandLabel: "50+ to 70 lb; billed by 1 lb interval above 51 lb",
-        explanation: "Extra-Large 50+ to 70 lb fees use the greater of unit weight or dimensional weight.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    if (tier.key === "xl_70_150") {
-      return withPeakFulfillment({
-        amount: intervalFee(formulaSource("xl70to150Formula"), band, tier.feeShippingWeight, 71, 1),
-        bandLabel: "70+ to 150 lb; billed by 1 lb interval above 71 lb",
-        explanation: "Extra-Large 70+ to 150 lb fees use the greater of unit weight or dimensional weight.",
-        supported: true
-      }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
-    }
-
-    return withPeakFulfillment({
-      amount: intervalFee(formulaSource("xl150PlusFormula"), band, tier.feeShippingWeight, 151, 1),
-      bandLabel: "150+ lb; billed by 1 lb interval above 151 lb",
-      explanation: "Extra-Large 150+ lb fees use unit weight only.",
-      supported: true
-    }, input, usePeak, usePeak ? peakDetail : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.");
+    return withPeakFulfillment({ amount: round2(result.amount), bandLabel: result.bandLabel,
+      explanation: `${tier.label}: ${tier.shippingWeightBasis}.${excluded ? " 该收费品类不符合低价资格，按 $10–$50 费率计算。" : ""}`,
+      supported: true }, input, Boolean(input.peakFulfillmentFees), input.peakFulfillmentFees
+        ? `Using 2026 Peak fulfilment fee table for ${PEAK_FULFILLMENT.periodLabel}.`
+        : "2027 非旺季配送费：January 15, 2027 - October 14, 2027。");
   }
 
   function baseFeeCa(input, tier) {
@@ -1347,6 +1914,7 @@
       return { amount: 0, applied: false, reason: "当前提供的 CA / MX 文件中没有 low-inventory-level fee 费率，因此这里不计入。" };
     }
 
+    if (!input.peakFulfillmentFees) return lowInventoryFee2027(input, tier);
     const exemptReasons = lowInventoryExemptionReasons(input);
     if (exemptReasons.length) {
       return { amount: 0, applied: false, reason: `已勾选豁免条件：${exemptReasons.join(" / ")}。` };
@@ -1376,6 +1944,34 @@
       band,
       reason: `两组 DOS 都低于 28 天，且按较大的 DOS = ${round2(band.effectiveDos)} 归档到 ${band.label}。`
     };
+  }
+
+  function lowInventoryFee2027(input, tier) {
+    const prefix = "2027-02-01 起，FNSKU 按评估日前后各28天出货计算；四周后独立收费。";
+    const exempt = lowInventoryExemptionReasons(input).map(reason => reason.replace("first 180 days", "first 120 days / first 200 units"));
+    if (input.noTrailingShipments) exempt.push("任一28天窗口无出货");
+    if (exempt.length) return { amount: 0, applied: false, reason: `${prefix} 豁免：${exempt.join(" / ")}。` };
+    if (input.longTermDos == null || input.shortTermDos == null) return { amount: 0, applied: false, reason: `${prefix} 未估算：请填写前28天与后28天 DOS；预测值仅用于情景估算。` };
+    const band = lowInventoryBand(input.longTermDos, input.shortTermDos);
+    if (!band) return { amount: 0, applied: false, reason: `${prefix} 至少一组 DOS ≥ 28 天，不收费。` };
+    let rates;
+    if (tier.key === "small_standard") rates = [0.89, 0.63, 0.32];
+    else if (tier.key === "large_standard") rates = tier.feeShippingWeight <= 3 ? [0.97, 0.70, 0.36] : [1.11, 0.87, 0.47];
+    else if (["small_bulky", "medium_bulky"].includes(tier.key)) rates = [1.85, 1.02, 0.51];
+    else if (["large_bulky", "extra_large_bulky"].includes(tier.key)) rates = [2.09, 1.15, 0.57];
+    else if (["small_oversize", "medium_oversize", "large_oversize"].includes(tier.key)) rates = [2.90, 1.30, 0.81];
+    else rates = [3.50, 1.57, 0.97];
+    return { amount: rates[{lt14:0, lt21:1, lt28:2}[band.key]], applied: true, band,
+      reason: `${prefix} 情景估算：两组 DOS 均不足28天，按较大值 ${band.effectiveDos} 天计费。` };
+  }
+
+  function oversizeHandlingFee(input, tier) {
+    const flatRates = { small_oversize:8.40, medium_oversize:8.65, large_oversize:9.42, long_oversize:10.48, special_oversize_light:21.67, special_oversize_heavy:29.53 };
+    const overhangRates = { long_oversize:3.45, special_oversize_light:5.23, special_oversize_heavy:10.45 };
+    if (input.market !== "US" || input.peakFulfillmentFees || flatRates[tier.key] == null) return {flat:0, overhang:0, amount:0};
+    const flat = tier.dims[2] < 4 - 1e-9 && tier.dims[1] >= 25 - 1e-9 ? flatRates[tier.key] : 0;
+    const overhang = tier.dims[1] > 43 + 1e-9 ? overhangRates[tier.key] || 0 : 0;
+    return {flat, overhang, amount:round2(flat+overhang)};
   }
 
   function sippAdjustmentUs(input, tier) {
@@ -1408,7 +2004,7 @@
       };
     }
 
-    if (tier.key === "small_bulky" || tier.key === "large_bulky") {
+    if (["small_bulky", "medium_bulky", "large_bulky", "extra_large_bulky"].includes(tier.key)) {
       if (input.sippCertified) {
         return {
           amount: 0,
@@ -1769,6 +2365,9 @@
       `);
     }
 
+    for (const [amount, label, reason] of [[view.handling?.flat, "Flat product handling fee", "Oversize 最短边 < 4 in，且中间边 ≥ 25 in"], [view.handling?.overhang, "Overhang handling fee", "Oversize 中间边 > 43 in"]]) {
+      if (amount) breakdown.push(`<div class="line-item"><div><strong>${label}</strong><span>${reason}</span></div><div class="amount plus">+${money(amount, view.market)}</div></div>`);
+    }
     const notes = [
       view.baseExplanation,
       ...(view.peakFulfillment && view.peakFulfillment.enabled ? [view.peakFulfillment.detail] : []),
@@ -1780,7 +2379,7 @@
     ];
 
     if (view.market === "US") {
-      notes.push("本页的 US 部分只实现你提供文件里覆盖的 2026-01-15 之后美国本地规则。SIPP 已计入总额；returns processing / storage / aged inventory / referral fee 仍未计入。");
+      notes.push("美国站默认2027非旺季，勾选切换2026旺季；燃油附加费仅按基础配送费计算。低库存费可选估算独立列示。仓储、退货及远程配送未计入。");
     } else if (view.market === "CA") {
       notes.push("本页的 CA 部分只实现你提供文件里覆盖的 2026-01-15 之后加拿大非旺季 fulfilment fee 与 SIPP discount。GST / HST 及 Special Handling surcharge 未计入。");
     } else {
@@ -1814,7 +2413,8 @@
           <div class="facts">
             <div class="fact"><span>站点</span><strong>${view.marketLabel}</strong></div>
             <div class="fact"><span>费率类别</span><strong>${view.categoryLabel}</strong></div>
-            <div class="fact"><span>价格带</span><strong>${view.priceBandLabel}</strong></div>
+            <div class="fact"><span>价格带</span><strong>${view.lowPriceExcluded ? "$10–$50（低价资格排除）" : view.priceBandLabel}</strong></div>
+            ${view.feeVersion ? `<div class="fact"><span>费率版本</span><strong>${view.feeVersion === "peak2026" ? "2026 旺季 · 2026/10/15–2027/1/14" : "2027 非旺季 · 2027/1/15–10/14"}</strong></div>` : ""}
             <div class="fact"><span>SIPP</span><strong>${view.sippCertified ? "已参加" : "未参加"}</strong></div>
             <div class="fact"><span>最长边</span><strong>${view.dims[0].toFixed(2)} ${view.dimensionUnit}</strong></div>
             <div class="fact"><span>中间边</span><strong>${view.dims[1].toFixed(2)} ${view.dimensionUnit}</strong></div>
@@ -1849,6 +2449,9 @@
       note: dom.historyNote ? dom.historyNote.value.trim() : "",
       inputs: {
         market: input.market,
+        usFeeVersion: input.market === "US" ? usFeeVersion(input) : null,
+        lowPriceExcluded: input.lowPriceExcluded,
+        noTrailingShipments: input.noTrailingShipments,
         category: input.category,
         length: String(input.lengthRaw),
         width: String(input.widthRaw),
@@ -1901,11 +2504,24 @@
     dom.awdExempt.checked = Boolean(input.awdExempt);
     dom.slowMoverExempt.checked = Boolean(input.slowMoverExempt);
     if (dom.historyNote) dom.historyNote.value = record.note || "";
+    if (dom.lowPriceExcluded) dom.lowPriceExcluded.checked = Boolean(input.lowPriceExcluded);
+    if (dom.noTrailingShipments) dom.noTrailingShipments.checked = Boolean(input.noTrailingShipments);
+    syncUsVersionUi();
+    if (input.market === "US" && !input.usFeeVersion && !input.peakFulfillmentFees) {
+      dom.longTermDos.value = "";
+      dom.shortTermDos.value = "";
+      dom.newToFbaExempt.checked = false;
+      dom.lastResultView = null;
+      dom.profitResult = null;
+      renderEmptyState(`这是一条旧版2026非旺季历史记录，原结果 ${money(Number(record.resultSummary?.totalFee || 0), "US")}。已恢复基础输入；点击计算会按2027非旺季重新估算，旧DOS和新品豁免不沿用。`);
+      return;
+    }
     calculate();
   }
 
   function calculate({ saveHistory = false } = {}) {
     const input = collectInput();
+    syncUsVersionUi();
     updateTierHighlight();
     if (!validateInput(input)) {
       dom.lastResultView = null;
@@ -1920,6 +2536,7 @@
     const sipp = sippAdjustment(input, tier);
     const lowInventory = lowInventoryFee(input, tier);
     const overmax = overmaxFee(tier);
+    const handling = oversizeHandlingFee(input, tier);
 
     let total = null;
     if (base.supported) {
@@ -1930,6 +2547,7 @@
         - (sipp.type === "discount" ? sipp.amount : 0)
         + lowInventory.amount
         + overmax.amount
+        + handling.amount
       );
     }
 
@@ -1956,6 +2574,9 @@
       sippCertified: input.sippCertified,
       lowInventory,
       overmax,
+      handling,
+      feeVersion: input.market === "US" ? usFeeVersion(input) : null,
+      lowPriceExcluded: input.market === "US" && !input.peakFulfillmentFees && input.lowPriceExcluded && input.price < 10,
       total,
       totalLabel: total == null ? "当前组合在提供的费率表中缺少完整价格，请人工复核" : "基础费 + fuel surcharge ± SIPP 调整 + 可能的 market-specific surcharge",
       priceBandLabel: priceBandLabel(input),
@@ -1979,8 +2600,38 @@
     dom.category.innerHTML = options.join("");
   }
 
+  function syncUsVersionUi() {
+    if (!dom.market) return;
+    const us = dom.market.value === "US";
+    const peak = dom.peakFulfillmentFees.checked;
+    const setText = (id, text) => { const e = document.getElementById(id); if (e) e.textContent = text; };
+    setText("peak-mode-hint", us ? "不勾选：2027/1/15–10/14 非旺季。勾选：2026/10/15–2027/1/14 旺季；尺寸档位和附加费同步切换。" : "CA 保持现有非旺季／2026旺季；MX 保持原费率。");
+    setText("long-dos-label", peak ? "Long-term historical DOS（90天）" : "评估日前28天 DOS（2027/2/1起）");
+    setText("short-dos-label", peak ? "Short-term historical DOS（30天）" : "评估日后28天 DOS（实际或预测）");
+    setText("new-fba-label", peak ? "New-to-FBA 前180天且符合 New Selection" : "New-to-FBA 前120天／首200件且符合 New Selection");
+    const lowPrice = document.getElementById("low-price-condition");
+    if (lowPrice) lowPrice.hidden = !us || peak || !(Number(dom.price.value) < 10);
+    const noShip = document.getElementById("no-shipments-condition");
+    if (noShip) noShip.hidden = !us || peak;
+    setText("low-inventory-hint", peak ? "2026旺季使用历史30／90天DOS。未填写时不估算。" : "独立可选情景估算：2027/2/1起，按FNSKU前后28天出货计算，四周后独立收费；不代表1/15–1/31的低库存规则。未填写时未估算。");
+    renderSizeTierGuide(dom.market.value);
+  }
+
   function renderSizeTierGuide(market) {
-    const guide = DATA.sizeTierGuides[market];
+    const guide = market === "US" && !dom.peakFulfillmentFees.checked ? {
+      intro: "2027/1/15起。尺寸按长／中／短边排序；Bulky及Oversize体积重宽高最低2英寸，Large standard使用实际尺寸。",
+      items: [
+        {title:"Small standard-size",detail:"≤15×12×0.75 in，实重≤16 oz"},
+        {title:"Large standard-size",detail:"≤18×14×8 in，运输重量≤20 lb"},
+        ...[["Small bulky",28,24,20],["Medium bulky",37,28,20],["Large bulky",52,28,28],["Extra-large bulky",59,33,33]].map(([title,l,w,h])=>({title,detail:`≤${l}×${w}×${h} in，运输重量≤50 lb，长＋围长≤130 in`})),
+        {title:"Small oversize",detail:"运输重量≤50 lb，最长边≤72 in，长＋围长≤130 in"},
+        {title:"Medium oversize",detail:"运输重量≤70 lb，最长边≤78 in，长＋围长≤130 in"},
+        {title:"Large oversize",detail:"运输重量≤150 lb，最长边≤96 in，长＋围长≤130 in"},
+        {title:"Long oversize",detail:"运输重量≤150 lb，最长边<108 in，长＋围长<165 in；超出更小档位"},
+        {title:"Special oversize light",detail:"运输重量≤150 lb，最长边≥108 in 或长＋围长≥165 in"},
+        {title:"Special oversize heavy",detail:"运输重量>150 lb；基础配送费按实重"}
+      ]
+    } : DATA.sizeTierGuides[market];
     dom.sizeTierGuideTitle.textContent = `${DATA.markets[market].short} Size Tier`;
     dom.sizeTierGuideIntro.textContent = guide.intro;
     dom.sizeTierGuideGrid.innerHTML = guide.items.map((item) => (
@@ -1998,7 +2649,7 @@
     dom.priceLabel.textContent = meta.priceLabel;
     dom.priceHint.textContent = meta.priceHint;
     dom.categoryLabel.textContent = meta.categoryLabel;
-    renderSizeTierGuide(market);
+    syncUsVersionUi();
     updateTierHighlight();
 
     if (meta.priceRequired) {
@@ -2016,7 +2667,7 @@
     dom.usOnlySection.hidden = !showUsOnly;
 
     dom.resultIntro.textContent = market === "US"
-      ? "结果会显示 US 基础履约费、SIPP 调整、low inventory 附加费和 overmax handling fee。"
+      ? "美国站默认2027非旺季；可切换2026旺季。显示基础配送费、燃油、SIPP／包装费、尺寸附加费及可选低库存估算。"
       : market === "CA"
         ? "结果会显示 CA 的基础 fulfilment fee、SIPP discount，以及已知边界说明。"
         : "结果会显示 MX 的基础 fulfilment fee、SIPP discount，以及当前费率表未覆盖组合的提示。";
@@ -2162,6 +2813,8 @@
     dom.peakFulfillmentFees = document.getElementById("peakFulfillmentFees");
     dom.largeStandardDimMinimum = document.getElementById("largeStandardDimMinimum");
     dom.sippCertified = document.getElementById("sippCertified");
+    dom.lowPriceExcluded = document.getElementById("lowPriceExcluded");
+    dom.noTrailingShipments = document.getElementById("noTrailingShipments");
     dom.longTermDos = document.getElementById("longTermDos");
     dom.shortTermDos = document.getElementById("shortTermDos");
     dom.groceryExempt = document.getElementById("groceryExempt");
@@ -2188,7 +2841,12 @@
       calculate();
     });
 
-    dom.form.addEventListener("input", updateTierHighlight);
+    dom.peakFulfillmentFees.addEventListener("change", () => {
+      if (dom.market.value === "US") { dom.longTermDos.value = ""; dom.shortTermDos.value = ""; dom.newToFbaExempt.checked = false; if (dom.noTrailingShipments) dom.noTrailingShipments.checked = false; }
+      syncUsVersionUi();
+      calculate();
+    });
+    dom.form.addEventListener("input", () => { syncUsVersionUi(); updateTierHighlight(); });
     dom.form.addEventListener("change", updateTierHighlight);
     updateTierHighlight();
     dom.form.addEventListener("submit", (event) => {

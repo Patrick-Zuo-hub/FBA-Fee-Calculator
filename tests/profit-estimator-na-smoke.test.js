@@ -172,7 +172,7 @@ test("sync pulls a valid FBA fee after fee calculation", () => {
 
   elements.profitSyncButton.listeners.click();
 
-  assert.equal(extractInputValue(elements["result-root"].innerHTML, "profitFbaFee"), "3.17");
+  assert.equal(extractInputValue(elements["result-root"].innerHTML, "profitFbaFee"), "3.41");
 });
 
 test("sync can derive chargeable weight before any fee result exists", () => {
