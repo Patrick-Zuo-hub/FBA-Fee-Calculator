@@ -1138,6 +1138,17 @@
   }
 };
 
+  // Canada Seller Central GABBX6GZPA8MSZGW / G201105770; checked 2026-11-09.
+  const CA_2027 = {
+    envelopeFees: [4.53,4.78,5.09,5.36,5.70].map((amount,i)=>({maxKg:(i+1)/10,label:`Up to ${(i+1)*100} g`,amount})),
+    standardFees: [6.01,6.21,6.46,6.83,7.34,7.51,7.83,8.07,8.37,8.62,8.71,8.97,9.18,9.43,9.74].map((amount,i)=>({maxKg:(i+1)/10,label:`Up to ${(i+1)*100} g`,amount})),
+    standardOver: {base:10.47,increment:0.09,label:"Above first 1,500 g"},
+    oversize: {
+      small_bulky:{base:15.66,increment:0.48}, large_bulky:{base:19.60,increment:0.48},
+      xl_0_30:{base:38.35,increment:0.60}, xl_30_68:{base:83.43,increment:0.60}, xl_68_plus:{base:153.04,increment:0.60}
+    }
+  };
+
   const dom = {};
   const historyApi = globalThis.FBA_HISTORY || {};
 
@@ -1324,6 +1335,7 @@
       noTrailingShipments: fd.get("noTrailingShipments") === "on",
       largeStandardDimMinimum: fd.get("largeStandardDimMinimum") === "on",
       sippCertified: fd.get("sippCertified") === "on",
+      caSippDiscount: fd.get("caSippDiscount") == null || fd.get("caSippDiscount") === "" ? null : Number(fd.get("caSippDiscount")),
       longTermDos: fd.get("longTermDos") ? Number(fd.get("longTermDos")) : null,
       shortTermDos: fd.get("shortTermDos") ? Number(fd.get("shortTermDos")) : null,
       groceryExempt: fd.get("groceryExempt") === "on",
@@ -1554,7 +1566,7 @@
       dimWeight, dimWeightUnit: "lb", lengthPlusGirth: lpg, overmax: false, warnings: [] };
   }
 
-  function classifyCa(input) {
+  function classifyCa2026(input) {
     const dims = sortedDims(input.lengthCm, input.widthCm, input.heightCm);
     const dimWeightKg = dimensionalWeightMetric(dims);
     const shippingWeightKg = Math.max(input.unitWeightKg, dimWeightKg);
@@ -1632,6 +1644,28 @@
       overmax: false,
       warnings
     };
+  }
+
+  function classifyCa(input) {
+    if (input.peakFulfillmentFees) return classifyCa2026(input);
+    const dims = sortedDims(input.lengthCm,input.widthCm,input.heightCm);
+    const dimWeight = dimensionalWeightMetric(dims), unit = input.unitWeightKg, lpg = lengthPlusGirth(dims);
+    const tiers = [
+      ["small_standard","Small standard-size",0.5,38,27,2,Infinity],
+      ["large_standard","Large standard-size",9,45,35,20,Infinity],
+      ["small_bulky","Small bulky",23,95,70,50,330],
+      ["large_bulky","Large bulky",23,150,85,85,330]
+    ];
+    // CA defines tiers using unit weight, not dimensional weight.
+    let selected = tiers.find(([, ,kg,l,w,h,g])=>unit<=kg+1e-9 && dims[0]<=l+1e-9 && dims[1]<=w+1e-9 && dims[2]<=h+1e-9 && lpg<=g+1e-9);
+    if (!selected) selected = unit>68+1e-9 || dims[0]>245+1e-9 ? ["xl_68_plus","Extra-large 68+ kg"]
+      : unit>30+1e-9 ? ["xl_30_68","Extra-large 30+ to 68 kg"] : ["xl_0_30","Extra-large 0 to 30 kg"];
+    const raw = Math.max(unit,dimWeight), standard = selected[0].endsWith("standard");
+    const warnings = [];
+    if(dims[0]>270 || lpg>419 || raw>68) warnings.push("CA 商品可能另收特殊处理费，本结果未包含该费用，需人工核实；大屏电视也可能适用。");
+    return {market:"CA",key:selected[0],label:selected[1],dims,dimensionUnit:"cm",rawShippingWeight:raw,
+      feeShippingWeight:ceilTo(raw,standard?0.1:0.5),weightUnit:"kg",shippingWeightBasis:dimWeight>unit?"dimensional weight":"unit weight",
+      dimWeight,dimWeightUnit:"kg",lengthPlusGirth:lpg,overmax:false,warnings};
   }
 
   function classifyMx(input) {
@@ -1759,12 +1793,12 @@
   }
 
   function baseFeeCa(input, tier) {
-    const source = input.peakFulfillmentFees ? PEAK_FULFILLMENT.ca : DATA.ca;
+    const source = input.peakFulfillmentFees ? PEAK_FULFILLMENT.ca : CA_2027;
     const peakDetail = input.peakFulfillmentFees
       ? `Using 2026 Peak fulfilment fee table for ${PEAK_FULFILLMENT.periodLabel}.`
-      : "Peak fulfilment fee is not selected; using the regular base fulfilment fee.";
+      : "Peak fulfilment fee is not selected; using 2027 非旺季配送费（2027-01-15起）.";
 
-    if (tier.key === "envelope") {
+    if (["envelope", "small_standard"].includes(tier.key)) {
       const band = bandByLimit(source.envelopeFees, tier.feeShippingWeight, "maxKg");
       return withPeakFulfillment({
         amount: band.amount,
@@ -1774,7 +1808,7 @@
       }, input, input.peakFulfillmentFees, peakDetail);
     }
 
-    if (tier.key === "standard") {
+    if (["standard", "large_standard"].includes(tier.key)) {
       const fixedBand = source.standardFees.find((row) => tier.feeShippingWeight <= row.maxKg + 1e-9);
       if (fixedBand) {
         return withPeakFulfillment({
@@ -1787,7 +1821,7 @@
 
       const intervals = Math.max(0, Math.round((tier.feeShippingWeight - 1.5) / 0.1));
       return withPeakFulfillment({
-        amount: source.standardOver.base + (intervals * source.standardOver.increment),
+        amount: round2(source.standardOver.base + (intervals * source.standardOver.increment)),
         bandLabel: `${source.standardOver.label} (${intervals} interval${intervals === 1 ? "" : "s"} above first 1,500 g)`,
         explanation: "CA standard fulfilment fees above 1,500 g add CAD 0.09 per additional 100 g interval.",
         supported: true
@@ -1797,8 +1831,8 @@
     const formula = source.oversize[tier.key];
     const intervals = Math.max(0, Math.round((tier.feeShippingWeight - 0.5) / 0.5));
     return withPeakFulfillment({
-      amount: formula.base + (intervals * formula.increment),
-      bandLabel: `${formula.label}${intervals > 0 ? ` (${intervals} interval${intervals === 1 ? "" : "s"} above first 500 g)` : ""}`,
+      amount: round2(formula.base + (intervals * formula.increment)),
+      bandLabel: `${formula.label || "First 500 g"}${intervals > 0 ? ` (${intervals} interval${intervals === 1 ? "" : "s"} above first 500 g)` : ""}`,
       explanation: "CA oversize fulfilment fees use shipping weight rounded up to the nearest 500 g.",
       supported: true
     }, input, input.peakFulfillmentFees, peakDetail);
@@ -1910,8 +1944,9 @@
   }
 
   function lowInventoryFee(input, tier) {
+    if (input.market === "CA") return lowInventoryFeeCa(input,tier);
     if (input.market !== "US") {
-      return { amount: 0, applied: false, reason: "当前提供的 CA / MX 文件中没有 low-inventory-level fee 费率，因此这里不计入。" };
+      return { amount: 0, applied: false, reason: "MX 低库存费未估算。" };
     }
 
     if (!input.peakFulfillmentFees) return lowInventoryFee2027(input, tier);
@@ -1944,6 +1979,19 @@
       band,
       reason: `两组 DOS 都低于 28 天，且按较大的 DOS = ${round2(band.effectiveDos)} 归档到 ${band.label}。`
     };
+  }
+
+  function lowInventoryFeeCa(input,tier) {
+    if(input.peakFulfillmentFees) return {amount:0,applied:false,reason:"2026旺季模式未估算加拿大旧版低库存费。"};
+    const prefix="CA低库存费：2027-02-01起，FNSKU前后各28天DOS，四周后独立收费。";
+    if(!["small_standard","large_standard"].includes(tier.key)) return {amount:0,applied:false,reason:prefix+"只适用于标准尺寸，不适用于Bulky或Extra-large。"};
+    if(input.newSellerExempt||input.newToFbaExempt||input.slowMoverExempt||input.groceryExempt||input.noTrailingShipments) return {amount:0,applied:false,reason:prefix+"已选择适用豁免（CA慢销为过去7天出货少于10件；新品前120天、最多200件且符合New Selection）。"};
+    if(input.longTermDos==null||input.shortTermDos==null) return {amount:0,applied:false,reason:prefix+"未估算：请填写前后28天DOS，预测值仅供情景估算。"};
+    const band=lowInventoryBand(input.longTermDos,input.shortTermDos);
+    if(!band)return {amount:0,applied:false,reason:prefix+"至少一组DOS≥28，不收费。"};
+    const weight=tier.key==="small_standard"?input.unitWeightKg:tier.feeShippingWeight;
+    const rates=tier.key==="small_standard"?[1.21,.72,.43]:weight<=.3?[1.42,.83,.47]:weight<=1?[1.57,.89,.49]:weight<=1.5?[1.73,1.10,.56]:[2.09,1.41,.73];
+    return {amount:rates[{lt14:0,lt21:1,lt28:2}[band.key]],applied:true,band,reason:prefix+`情景估算，按较大DOS ${band.effectiveDos} 天归档。`};
   }
 
   function lowInventoryFee2027(input, tier) {
@@ -2033,6 +2081,12 @@
   }
 
   function sippAdjustmentCa(input, tier) {
+    if(!input.peakFulfillmentFees && input.sippCertified) {
+      const amount=input.caSippDiscount;
+      const valid=Number.isFinite(amount)&&amount>=0&&amount<=baseFeeCa(input,tier).amount;
+      return {amount:valid?amount:0,applied:valid,pending:!valid,type:valid?"discount":"none",label:"SIPP discount（已确认金额）",
+        reason:valid?"按手工填写的已确认CA 2027 SIPP折扣减费。":"CA 2027新档位的SIPP折扣尚未核实，请填写已确认的每件CAD折扣；完整总额暂不计算。"};
+    }
     if (!input.sippCertified) {
       return {
         amount: 0,
@@ -2381,7 +2435,7 @@
     if (view.market === "US") {
       notes.push("美国站默认2027非旺季，勾选切换2026旺季；燃油附加费仅按基础配送费计算。低库存费可选估算独立列示。仓储、退货及远程配送未计入。");
     } else if (view.market === "CA") {
-      notes.push("本页的 CA 部分只实现你提供文件里覆盖的 2026-01-15 之后加拿大非旺季 fulfilment fee 与 SIPP discount。GST / HST 及 Special Handling surcharge 未计入。");
+      notes.push("加拿大默认2027非旺季，勾选切换2026旺季；按实重判2027档位，按实重／体积重较大值计配送费。低库存估算仅适用于2027标准尺寸。税费、特殊处理费、仓储和退货未计入；2027 SIPP需填已确认折扣。");
     } else {
       notes.push("本页的 MX 部分按你提供的 Amazon.com.mx 费率卡计算；售价使用含 VAT 金额。若遇到 PDF 中标记为 N/A 的组合，将提示人工复核。");
     }
@@ -2414,7 +2468,7 @@
             <div class="fact"><span>站点</span><strong>${view.marketLabel}</strong></div>
             <div class="fact"><span>费率类别</span><strong>${view.categoryLabel}</strong></div>
             <div class="fact"><span>价格带</span><strong>${view.lowPriceExcluded ? "$10–$50（低价资格排除）" : view.priceBandLabel}</strong></div>
-            ${view.feeVersion ? `<div class="fact"><span>费率版本</span><strong>${view.feeVersion === "peak2026" ? "2026 旺季 · 2026/10/15–2027/1/14" : "2027 非旺季 · 2027/1/15–10/14"}</strong></div>` : ""}
+            ${view.feeVersion ? `<div class="fact"><span>费率版本</span><strong>${view.feeVersion === "peak2026" ? "2026 旺季 · 2026/10/15–2027/1/14" : view.market === "CA" ? "2027 非旺季 · 2027/1/15起" : "2027 非旺季 · 2027/1/15–10/14"}</strong></div>` : ""}
             <div class="fact"><span>SIPP</span><strong>${view.sippCertified ? "已参加" : "未参加"}</strong></div>
             <div class="fact"><span>最长边</span><strong>${view.dims[0].toFixed(2)} ${view.dimensionUnit}</strong></div>
             <div class="fact"><span>中间边</span><strong>${view.dims[1].toFixed(2)} ${view.dimensionUnit}</strong></div>
@@ -2450,6 +2504,8 @@
       inputs: {
         market: input.market,
         usFeeVersion: input.market === "US" ? usFeeVersion(input) : null,
+        caFeeVersion: input.market === "CA" ? usFeeVersion(input) : null,
+        caSippDiscount: input.caSippDiscount,
         lowPriceExcluded: input.lowPriceExcluded,
         noTrailingShipments: input.noTrailingShipments,
         category: input.category,
@@ -2506,14 +2562,16 @@
     if (dom.historyNote) dom.historyNote.value = record.note || "";
     if (dom.lowPriceExcluded) dom.lowPriceExcluded.checked = Boolean(input.lowPriceExcluded);
     if (dom.noTrailingShipments) dom.noTrailingShipments.checked = Boolean(input.noTrailingShipments);
+    const caSipp = document.getElementById("caSippDiscount");
+    if(caSipp) caSipp.value = input.caSippDiscount == null ? "" : String(input.caSippDiscount);
     syncUsVersionUi();
-    if (input.market === "US" && !input.usFeeVersion && !input.peakFulfillmentFees) {
+    if ((input.market === "US" && !input.usFeeVersion || input.market === "CA" && !input.caFeeVersion) && !input.peakFulfillmentFees) {
       dom.longTermDos.value = "";
       dom.shortTermDos.value = "";
       dom.newToFbaExempt.checked = false;
       dom.lastResultView = null;
       dom.profitResult = null;
-      renderEmptyState(`这是一条旧版2026非旺季历史记录，原结果 ${money(Number(record.resultSummary?.totalFee || 0), "US")}。已恢复基础输入；点击计算会按2027非旺季重新估算，旧DOS和新品豁免不沿用。`);
+      renderEmptyState(`这是一条旧版2026非旺季历史记录，原结果 ${money(Number(record.resultSummary?.totalFee || 0), input.market)}。已恢复基础输入；点击计算会按2027非旺季重新估算，旧DOS和新品豁免不沿用。`);
       return;
     }
     calculate();
@@ -2539,7 +2597,7 @@
     const handling = oversizeHandlingFee(input, tier);
 
     let total = null;
-    if (base.supported) {
+    if (base.supported && !sipp.pending) {
       total = round2(
         base.amount
         + fuelLogistics.amount
@@ -2575,10 +2633,10 @@
       lowInventory,
       overmax,
       handling,
-      feeVersion: input.market === "US" ? usFeeVersion(input) : null,
+      feeVersion: ["US","CA"].includes(input.market) ? usFeeVersion(input) : null,
       lowPriceExcluded: input.market === "US" && !input.peakFulfillmentFees && input.lowPriceExcluded && input.price < 10,
       total,
-      totalLabel: total == null ? "当前组合在提供的费率表中缺少完整价格，请人工复核" : "基础费 + fuel surcharge ± SIPP 调整 + 可能的 market-specific surcharge",
+      totalLabel: total == null ? (sipp.pending ? "CA 2027 SIPP折扣待核实，请填写已确认金额后计算完整总额" : "当前组合在提供的费率表中缺少完整价格，请人工复核") : "基础费 + fuel surcharge ± SIPP 调整 + 可能的 market-specific surcharge",
       priceBandLabel: priceBandLabel(input),
       categoryLabel: DATA.categories[input.market][input.category].short,
       warnings: tier.warnings
@@ -2603,22 +2661,32 @@
   function syncUsVersionUi() {
     if (!dom.market) return;
     const us = dom.market.value === "US";
+    const ca = dom.market.value === "CA";
     const peak = dom.peakFulfillmentFees.checked;
     const setText = (id, text) => { const e = document.getElementById(id); if (e) e.textContent = text; };
-    setText("peak-mode-hint", us ? "不勾选：2027/1/15–10/14 非旺季。勾选：2026/10/15–2027/1/14 旺季；尺寸档位和附加费同步切换。" : "CA 保持现有非旺季／2026旺季；MX 保持原费率。");
+    setText("peak-mode-hint", ca ? "不勾选：2027/1/15起加拿大非旺季。勾选：2026/10/15–2027/1/14旺季；判档和费率同步切换。" : us ? "不勾选：2027/1/15–10/14 非旺季。勾选：2026/10/15–2027/1/14 旺季；尺寸档位和附加费同步切换。" : "MX 保持原费率。");
     setText("long-dos-label", peak ? "Long-term historical DOS（90天）" : "评估日前28天 DOS（2027/2/1起）");
     setText("short-dos-label", peak ? "Short-term historical DOS（30天）" : "评估日后28天 DOS（实际或预测）");
     setText("new-fba-label", peak ? "New-to-FBA 前180天且符合 New Selection" : "New-to-FBA 前120天／首200件且符合 New Selection");
     const lowPrice = document.getElementById("low-price-condition");
     if (lowPrice) lowPrice.hidden = !us || peak || !(Number(dom.price.value) < 10);
     const noShip = document.getElementById("no-shipments-condition");
-    if (noShip) noShip.hidden = !us || peak;
+    if (noShip) noShip.hidden = !(us || ca) || peak;
+    setText("slow-mover-label",ca?"过去7天出货少于10件":"过去7天出货少于20件");
+    const awd=document.getElementById("awdExempt")?.closest?.("label");if(awd)awd.hidden=!us;
+    const manual=document.getElementById("ca-sipp-manual");if(manual)manual.hidden=!(ca&&!peak&&dom.sippCertified.checked);
+    if(dom.usOnlySection)dom.usOnlySection.hidden=!(us || ca&&!peak);
     setText("low-inventory-hint", peak ? "2026旺季使用历史30／90天DOS。未填写时不估算。" : "独立可选情景估算：2027/2/1起，按FNSKU前后28天出货计算，四周后独立收费；不代表1/15–1/31的低库存规则。未填写时未估算。");
     renderSizeTierGuide(dom.market.value);
   }
 
   function renderSizeTierGuide(market) {
-    const guide = market === "US" && !dom.peakFulfillmentFees.checked ? {
+    const caGuide = {intro:"2027/1/15起：按实重和实际尺寸判档；体积重=cm长×宽×高÷5000。标准尺寸按100g、大件按500g进位计配送费。",items:[
+      {title:"Small standard-size",detail:"≤38×27×2cm，实重≤0.5kg"},{title:"Large standard-size",detail:"≤45×35×20cm，实重≤9kg"},
+      {title:"Small bulky",detail:"≤95×70×50cm，实重≤23kg，长＋围长≤330cm"},{title:"Large bulky",detail:"≤150×85×85cm，实重≤23kg，长＋围长≤330cm"},
+      {title:"Extra-large 0 to 30 kg",detail:"超出Bulky；实重≤30kg，最长边≤245cm"},{title:"Extra-large 30+ to 68 kg",detail:"实重>30至68kg，最长边≤245cm"},
+      {title:"Extra-large 68+ kg",detail:"实重>68kg，或最长边>245cm；特殊处理费需另核"}]};
+    const guide = market === "CA" && !dom.peakFulfillmentFees.checked ? caGuide : market === "US" && !dom.peakFulfillmentFees.checked ? {
       intro: "2027/1/15起。尺寸按长／中／短边排序；Bulky及Oversize体积重宽高最低2英寸，Large standard使用实际尺寸。",
       items: [
         {title:"Small standard-size",detail:"≤15×12×0.75 in，实重≤16 oz"},
@@ -2663,7 +2731,7 @@
       dom.price.placeholder = "加拿大站不使用售价";
     }
 
-    const showUsOnly = market === "US";
+    const showUsOnly = market === "US" || market === "CA" && !dom.peakFulfillmentFees.checked;
     dom.usOnlySection.hidden = !showUsOnly;
 
     dom.resultIntro.textContent = market === "US"
@@ -2723,12 +2791,12 @@
         dom.fuelLogisticsSurcharge.checked = true;
         dom.peakFulfillmentFees.checked = false;
         dom.largeStandardDimMinimum.checked = false;
-        dom.sippCertified.checked = true;
+        dom.sippCertified.checked = false;
       } else {
-        dom.length.value = "152.4";
-        dom.width.value = "97.8";
-        dom.height.value = "12.1";
-        dom.weight.value = "44.23";
+        dom.length.value = "109.220";
+        dom.width.value = "81.280";
+        dom.height.value = "5.080";
+        dom.weight.value = "8.573";
         dom.category.value = "general";
         dom.fuelLogisticsSurcharge.checked = true;
         dom.peakFulfillmentFees.checked = false;
@@ -2765,6 +2833,8 @@
       }
     }
 
+    if(dom.noTrailingShipments)dom.noTrailingShipments.checked=false;
+    const caDiscount=document.getElementById("caSippDiscount");if(caDiscount)caDiscount.value="";
     dom.groceryExempt.checked = false;
     dom.newSellerExempt.checked = false;
     dom.newToFbaExempt.checked = false;
@@ -2837,12 +2907,14 @@
     renderEmptyState(`先选择站点，再输入尺寸、重量、售价和费率类别，然后点击“计算北美 FBA 费用”。`);
 
     dom.market.addEventListener("change", () => {
+      dom.longTermDos.value="";dom.shortTermDos.value="";dom.slowMoverExempt.checked=false;dom.newToFbaExempt.checked=false;
+      if(dom.noTrailingShipments)dom.noTrailingShipments.checked=false;
       syncMarketUi();
       calculate();
     });
 
     dom.peakFulfillmentFees.addEventListener("change", () => {
-      if (dom.market.value === "US") { dom.longTermDos.value = ""; dom.shortTermDos.value = ""; dom.newToFbaExempt.checked = false; if (dom.noTrailingShipments) dom.noTrailingShipments.checked = false; }
+      if (["US","CA"].includes(dom.market.value)) { dom.longTermDos.value = ""; dom.shortTermDos.value = ""; dom.newToFbaExempt.checked = false; if (dom.noTrailingShipments) dom.noTrailingShipments.checked = false; }
       syncUsVersionUi();
       calculate();
     });

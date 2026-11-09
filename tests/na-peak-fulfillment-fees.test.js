@@ -185,7 +185,7 @@ test("CA uses peak fulfilment column only when enabled", () => {
   elements.peakFulfillmentFees.checked = false;
 
   const standardMarkup = submit(elements);
-  assert.equal(total(standardMarkup, "CAD"), 6.36);
+  assert.equal(total(standardMarkup, "CAD"), 6.46);
 
   elements.peakFulfillmentFees.checked = true;
   const peakMarkup = submit(elements);
@@ -242,4 +242,15 @@ test("new US history stores explicit version; legacy regular records never silen
   restoreRecord(saved);
   assert.match(elements['result-root'].innerHTML,/2027 非旺季/);
   assert.equal(total(elements['result-root'].innerHTML,'USD'),2.72);
+});
+
+
+test("CA history saves explicit version and protects old non-peak records",()=>{
+ const {elements,context,restoreRecord}=loadCalculator();elements.market.value='CA';elements.market.listeners.change();
+ for(const [key,v]of Object.entries({category:'general',dimensionUnit:'cm',weightUnit:'kg',length:'109.220',width:'81.280',height:'5.080',weight:'8.573',price:''}))elements[key].value=v;
+ submit(elements);const record=JSON.parse(context.localStorage.getItem('fba-history-na'))[0];
+ assert.equal(record.inputs.caFeeVersion,'regular2027');assert.equal(record.resultSummary.totalFee,28.24);
+ restoreRecord({...record,inputs:{...record.inputs,caFeeVersion:undefined},resultSummary:{totalFee:47.14}});
+ assert.match(elements['result-root'].innerHTML,/旧版2026非旺季历史记录/);assert.match(elements['result-root'].innerHTML,/CAD 47.14/);
+ restoreRecord(record);assert.equal(total(elements['result-root'].innerHTML,'CAD'),28.24);
 });

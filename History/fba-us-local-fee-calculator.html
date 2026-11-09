@@ -697,7 +697,7 @@
   <script defer src="./profit-estimator.js?v=20261030profit"></script>
   <script defer src="./fba-surcharge-rules.js"></script>
   <script defer src="./fba-history.js"></script>
-  <script defer src="./fba-us-local-fee-calculator.js?v=20261106us2027"></script>
+  <script defer src="./fba-us-local-fee-calculator.js?v=20261109ca2027"></script>
   <link rel="stylesheet" href="../assets/ant-legacy.css?v=20261030profit2" />
   <script defer src="../assets/ant-loader.js?v=20261030profit"></script>
 </head>
@@ -724,7 +724,7 @@
           </div>
           <div class="mini-card">
             <span>生效日期</span>
-            <strong>US 2027／2026旺季</strong>
+            <strong>US／CA 2027／2026旺季</strong>
           </div>
           <div class="mini-card">
             <span>尺寸层级</span>
@@ -737,7 +737,7 @@
         </div>
         <ul class="hero-list">
           <li>US 保留 `non-apparel`、`apparel`、`dangerous goods` 三套2027非旺季及2026旺季费率。</li>
-          <li>CA 支持 `Envelope / Standard / Oversize` 以及对应的 SIPP discount。</li>
+          <li>CA 默认2027新档位与费率；勾选可回到2026旺季。2027 SIPP需填已确认折扣。</li>
           <li>MX 支持 3 套费率组、含 VAT 售价带与 SIPP discount。</li>
           <li>US 支持2027 Flat／Overhang、Bulky包装费与可选低库存估算；2026旺季使用旧Overmax。</li>
         </ul>
@@ -839,7 +839,7 @@
               <input id="peakFulfillmentFees" name="peakFulfillmentFees" type="checkbox" />
               <div>
                 <strong>使用 2026 旺季费用</strong>
-                <span id="peak-mode-hint">美国站默认2027/1/15–10/14非旺季；勾选切换2026/10/15–2027/1/14旺季。加拿大和墨西哥保持原规则。</span>
+                <span id="peak-mode-hint">US／CA默认2027非旺季，勾选切换2026旺季。MX保持原规则。</span>
               </div>
             </label>
 
@@ -864,6 +864,11 @@
             <input id="lowPriceExcluded" name="lowPriceExcluded" type="checkbox" />
             <div><strong>属于不享受2027低价费率的收费品类</strong><span>Automotive and Powersports、Compact Appliances、Computers、Musical Instruments and AV Production、Media（Books/DVD/Music/Software/Video）。售价低于$10时按$10–$50费率计算。</span></div>
           </label>
+          <div class="field" id="ca-sipp-manual" hidden>
+            <label for="caSippDiscount">CA 2027 已确认SIPP折扣（CAD/件）</label>
+            <input id="caSippDiscount" name="caSippDiscount" type="number" min="0" step="0.01" />
+            <span>新档位折扣待核实；请填官方工具或费率表确认的金额。未填时不输出完整总额，0表示已确认无折扣。</span>
+          </div>
           <section class="guide-card">
             <div class="guide-head">
               <h3 id="size-tier-guide-title">当前站点 Size Tier</h3>
@@ -926,7 +931,7 @@
               <label class="toggle">
                 <input id="slowMoverExempt" name="slowMoverExempt" type="checkbox" />
                 <div>
-                  <strong>过去 7 天出货少于 20 件</strong>
+                  <strong id="slow-mover-label">过去7天出货少于20件</strong>
                   <span>慢销 SKU 免 low-inventory-level fee。</span>
                 </div>
               </label>
@@ -934,7 +939,7 @@
           </div>
 
           <div class="tiny">
-            美国站规则核对：2026-11-06；使用亚马逊2027非旺季／2026旺季官方费率。加拿大、墨西哥保持既有规则。
+            US规则核对：2026-11-06；CA规则核对：2026-11-09。US／CA默认2027非旺季，支持2026旺季。MX保持既有规则。
           </div>
         </form>
       </section>
