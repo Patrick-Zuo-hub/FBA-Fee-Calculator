@@ -108,6 +108,9 @@ function setupNaCalculator() {
     { id: "profitVat", name: "" },
     { id: "profitReferralRate", name: "" },
     { id: "profitFbaFee", name: "" },
+    { id: "profitVolumeCbm", name: "" },
+    { id: "profitActualWeightKg", name: "" },
+    { id: "profitFirstLegPriceRmbPerCbm", name: "" },
     { id: "profitChargeableWeightKg", name: "" },
     { id: "profitFirstLegPriceRmbPerKg", name: "" },
     { id: "profitProductCostRmb", name: "" },
@@ -146,6 +149,20 @@ function extractInputValue(markup, inputId) {
   assert.ok(match, `Expected ${inputId} value in markup`);
   return match[1];
 }
+
+test("Mexico uses its VAT default when switching markets and accepts manual edits", () => {
+  const { elements } = setupNaCalculator();
+  elements.market.value = "MX";
+  elements.market.listeners.change();
+  const result = elements["result-root"];
+  assert.equal(extractInputValue(result.innerHTML, "profitVat"), "16");
+  elements.profitVat.value = "0";
+  elements.profitCalculateButton.listeners.click();
+  assert.equal(extractInputValue(result.innerHTML, "profitVat"), "0");
+  elements.market.value = "CA";
+  elements.market.listeners.change();
+  assert.equal(extractInputValue(result.innerHTML, "profitVat"), "0");
+});
 
 test("manual profit calculation works without sync", () => {
   const { elements } = setupNaCalculator();
@@ -208,4 +225,43 @@ test("manual estimator edits survive profit calculation after sync", () => {
   elements.profitCalculateButton.listeners.click();
 
   assert.equal(extractInputValue(elements["result-root"].innerHTML, "profitFbaFee"), "9.99");
+});
+
+test("Mexico syncs box volume and actual weight and bills the larger volume", () => {
+  const { elements } = setupNaCalculator();
+  elements.market.value = "MX";
+  elements.market.listeners.change();
+  const markup = () => elements["result-root"].innerHTML;
+  assert.equal(extractInputValue(markup(), "profitFirstLegPriceRmbPerCbm"), "2900");
+  assert.equal(extractInputValue(markup(), "profitExchangeRate"), "0.4");
+  elements.dimensionUnit.value = "cm";
+  elements.weightUnit.value = "kg";
+  elements.length.value = "66.4";
+  elements.width.value = "6";
+  elements.height.value = "88";
+  elements.weight.value = "7.2";
+  elements.price.value = "1342.93";
+  elements.category.value = "general";
+  elements["us-fee-form"].listeners.submit({ preventDefault() {} });
+  elements.profitSyncButton.listeners.click();
+  const volume = extractInputValue(markup(), "profitVolumeCbm");
+  assert.ok(Math.abs(Number(volume) - 0.0350592) < 1e-12);
+  assert.equal(extractInputValue(markup(), "profitActualWeightKg"), "7.2");
+
+  elements.profitGrossSellingPrice.value = "1342.93";
+  elements.profitVat.value = "16";
+  elements.profitReferralRate.value = "15";
+  elements.profitFbaFee.value = extractInputValue(markup(), "profitFbaFee");
+  assert.equal(elements.profitFbaFee.value, "124.15");
+  elements.profitProductCostRmb.value = "74";
+  elements.profitExchangeRate.value = "0.4";
+  elements.profitFirstLegPriceRmbPerCbm.value = "2900";
+  elements.profitVolumeCbm.value = volume;
+  elements.profitActualWeightKg.value = "7.2";
+  elements.profitCalculateButton.listeners.click();
+  assert.match(markup(), /29\.26%/);
+  elements.profitActualWeightKg.value = "35";
+  elements.profitCalculateButton.listeners.click();
+  assert.match(markup(), /0\.100000 m³/);
+  assert.match(markup(), /MXN 725\.00/);
 });

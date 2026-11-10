@@ -26,7 +26,8 @@
     }else{component=Input;props.value=native.value;props.placeholder=native.placeholder;props.readOnly=native.readOnly;props.maxLength=native.maxLength>0?native.maxLength:undefined;}
     root.render(h(ConfigProvider,{theme:{token:{colorPrimary:'#d92d27',borderRadius:6,fontFamily:'-apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif'}}},h(component,props)));
   }
-  let activeTab='fees', profitSource=null;
+  let activeTab = new URLSearchParams(location.search).get('tab') === 'profit' ? 'profit' : 'fees';
+  let profitSource = null;
   function layoutCalculator(){
     const workspace=document.querySelector('.workspace');
     const result=document.getElementById('result-root');
@@ -67,7 +68,7 @@
       pane.append(fresh);
     }
     for(const child of inputPanel.children){
-      if(child===tabs||child.tagName==='H2')continue;
+      if(child===tabs||child.tagName==='H2'||child.hasAttribute('data-shared-market'))continue;
       child.hidden=child===pane?activeTab!=='profit':activeTab!=='fees';
     }
     for(const button of tabs.children){const selected=button.dataset.tab===activeTab;button.setAttribute('aria-selected',String(selected));}

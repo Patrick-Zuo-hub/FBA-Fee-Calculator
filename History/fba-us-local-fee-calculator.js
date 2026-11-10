@@ -391,9 +391,10 @@
         standardOver1: { lt150: 28.50, lt299: 40.00, lt499: 60.00, gte499: 72.80, increment: { lt150: 1.74, lt299: 1.74, lt499: 1.50, gte499: 1.15 } },
         oversize: {
           first1kg: { lt150: 32.00, lt299: 38.20, lt499: 61.00, gte499: 75.40 },
-          upTo50Increment: { lt150: 2.80, lt299: 2.80, lt499: 2.80, gte499: 3.50 },
-          base50kg: { lt150: 306.40, lt299: 312.60, lt499: 335.40, gte499: 418.40 },
-          over50Increment: { lt150: 1.50, lt299: 1.50, lt499: 1.50, gte499: 2.00 }
+          upTo50Increment: { lt150: 2.80, lt299: 2.80, lt499: 2.80, gte499: 3.75 },
+          base50kg: { lt150: 306.40, lt299: 312.60, lt499: 335.40, gte499: 442.90 },
+          over50Increment: { lt150: 1.50, lt299: 1.50, lt499: 1.50, gte499: 2.10 },
+          over100Increment: { gte499: 3.60 }
         }
       },
       health_grocery: {
@@ -1902,6 +1903,17 @@
       };
     }
 
+    const over100Rate = category.oversize.over100Increment?.[band];
+    if (tier.rawShippingWeight > 100 && over100Rate != null) {
+      const base100 = base50 + 100 * category.oversize.over50Increment[band];
+      const intervals = Math.ceil((tier.rawShippingWeight - 100) / 0.5 - 1e-9);
+      return {
+        amount: base100 + intervals * over100Rate,
+        bandLabel: "Over 100 kg",
+        explanation: "MX oversize fees above 100 kg add a per-0.5 kg increment to the 100 kg fee.",
+        supported: true
+      };
+    }
     const intervals = Math.max(0, Math.ceil(((tier.rawShippingWeight - 50) / 0.5) - 1e-9));
     return {
       amount: base50 + (intervals * category.oversize.over50Increment[band]),
@@ -2210,14 +2222,17 @@
   }
 
   function createProfitState(market) {
+    const previous = dom.profitState;
+    const switchingMexico = previous && previous.market !== market && (previous.market === "MX" || market === "MX");
+    if (switchingMexico) dom.profitResult = null;
     if (typeof profitEstimator.createProfitState === "function") {
-      return profitEstimator.createProfitState({ market }, dom.profitState);
+      return profitEstimator.createProfitState({ market }, switchingMexico ? { ...previous, vat: undefined, exchangeRate: undefined } : previous);
     }
 
     return {
       market,
       grossSellingPrice: "",
-      vat: 0,
+      vat: market === "MX" ? 16 : 0,
       referralRate: 15,
       fbaFee: "",
       chargeableWeightKg: "",
@@ -2239,6 +2254,9 @@
       vat: "profitVat",
       referralRate: "profitReferralRate",
       fbaFee: "profitFbaFee",
+      volumeCbm: "profitVolumeCbm",
+      actualWeightKg: "profitActualWeightKg",
+      firstLegPriceRmbPerCbm: "profitFirstLegPriceRmbPerCbm",
       chargeableWeightKg: "profitChargeableWeightKg",
       firstLegPriceRmbPerKg: "profitFirstLegPriceRmbPerKg",
       productCostRmb: "profitProductCostRmb",
@@ -2297,6 +2315,9 @@
       "profitVat",
       "profitReferralRate",
       "profitFbaFee",
+      "profitVolumeCbm",
+      "profitActualWeightKg",
+      "profitFirstLegPriceRmbPerCbm",
       "profitChargeableWeightKg",
       "profitFirstLegPriceRmbPerKg",
       "profitProductCostRmb",
@@ -2903,6 +2924,10 @@
       });
     }
 
+    if (typeof window.location?.search === "string") {
+      const market = new URLSearchParams(window.location.search).get("market");
+      if (["US", "CA", "MX"].includes(market)) dom.market.value = market;
+    }
     syncMarketUi();
     renderEmptyState(`先选择站点，再输入尺寸、重量、售价和费率类别，然后点击“计算北美 FBA 费用”。`);
 

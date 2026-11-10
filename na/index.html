@@ -7,7 +7,7 @@
   <script defer src="/assets/site.js"></script>
   <title>Marketplace Fee Studio | Amazon NA</title>
   <link rel="stylesheet" href="/assets/ant-workspace.css?v=20261030profit" />
-  <script defer src="/assets/ant-loader.js?v=20261030profit"></script>
+  <script defer src="/assets/ant-loader.js?v=20261110market"></script>
   <script defer src="/assets/au-calculator.js"></script>
   <script defer src="/assets/au-profit.js"></script>
 </head>
@@ -49,6 +49,14 @@
           title="Amazon NA FBA Fee Calculator"
           loading="lazy">
         </iframe>
+        <script>
+          const naQuery = new URLSearchParams(location.search);
+          const calculatorFrame = document.querySelector(".tool-embed");
+          const calculatorUrl = new URL(calculatorFrame.src);
+          if (["US", "CA", "MX"].includes(naQuery.get("market"))) calculatorUrl.searchParams.set("market", naQuery.get("market"));
+          if (naQuery.get("tab") === "profit") calculatorUrl.searchParams.set("tab", "profit");
+          if (calculatorUrl.href !== calculatorFrame.src) calculatorFrame.src = calculatorUrl.href;
+        </script>
       </div>
     </section>
   </main>

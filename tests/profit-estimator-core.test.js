@@ -26,9 +26,9 @@ test("defaults cover US, CA, MX, EU, UK, and Walmart", () => {
 
   assert.deepEqual(getProfitDefaults({ market: "MX" }), {
     market: "MX",
-    vat: 0,
+    vat: 16,
     referralRate: 15,
-    firstLegPriceRmbPerKg: 8,
+    firstLegPriceRmbPerCbm: 2900,
     exchangeRate: 0.4
   });
 

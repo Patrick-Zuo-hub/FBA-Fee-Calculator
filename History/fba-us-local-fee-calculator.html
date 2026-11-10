@@ -693,13 +693,14 @@
         max-width: none;
       }
     }
+    .mx-freight-help { grid-column: 1 / -1; margin: 0; }
   </style>
-  <script defer src="./profit-estimator.js?v=20261030profit"></script>
+  <script defer src="./profit-estimator.js?v=20261110mxcbm"></script>
   <script defer src="./fba-surcharge-rules.js"></script>
   <script defer src="./fba-history.js"></script>
-  <script defer src="./fba-us-local-fee-calculator.js?v=20261109ca2027"></script>
+  <script defer src="./fba-us-local-fee-calculator.js?v=20261110market"></script>
   <link rel="stylesheet" href="../assets/ant-legacy.css?v=20261030profit2" />
-  <script defer src="../assets/ant-loader.js?v=20261030profit"></script>
+  <script defer src="../assets/ant-loader.js?v=20261110market"></script>
 </head>
 <body data-ant-embedded="true">
   <div class="app">
@@ -749,16 +750,15 @@
         <h2>输入参数</h2>
         <p>先选择站点，再输入尺寸、重量和售价。尺寸可用英寸或厘米，重量可用 lb / oz / kg，页面会自动换算成对应站点的计费单位。</p>
 
-        <form id="us-fee-form" class="form-grid">
-          <div class="double">
-            <div class="field">
+            <div class="field" data-shared-market>
               <label for="market">站点</label>
-              <select id="market" name="market">
+              <select id="market" name="market" form="us-fee-form">
                 <option value="US">US / 美国站</option>
                 <option value="CA">CA / 加拿大站</option>
                 <option value="MX">MX / 墨西哥站</option>
               </select>
             </div>
+        <form id="us-fee-form" class="form-grid">
             <div class="field">
               <label for="category" id="category-label">产品类型</label>
               <select id="category" name="category">
@@ -767,7 +767,6 @@
                 <option value="dangerous_goods">Dangerous goods / 危险品</option>
               </select>
             </div>
-          </div>
 
           <div class="field">
             <label for="price" id="price-label">售价（USD）</label>
