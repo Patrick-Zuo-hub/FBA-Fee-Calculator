@@ -208,7 +208,9 @@ test("EU sample includes surcharge by default and removes it when unchecked", ()
   const totalWithSurcharge = parseCurrencyValue(withSurchargeMarkup, "€");
 
   assert.match(withSurchargeMarkup, /Fuel & logistics surcharge/);
-  assert.match(withSurchargeMarkup, /\+€0\.15/);
+  assert.match(withSurchargeMarkup, /2\.0%/);
+  assert.match(withSurchargeMarkup, /November 2, 2026/);
+  assert.match(withSurchargeMarkup, /\+€0\.19/);
 
   elements["fuel-logistics-surcharge"].checked = false;
   elements["fee-form"].listeners.submit({ preventDefault() {} });
@@ -216,5 +218,5 @@ test("EU sample includes surcharge by default and removes it when unchecked", ()
   const totalWithoutSurcharge = parseCurrencyValue(withoutSurchargeMarkup, "€");
 
   assert.match(withoutSurchargeMarkup, /Not applied/);
-  assert.equal(Number((totalWithSurcharge - totalWithoutSurcharge).toFixed(2)), 0.15);
+  assert.equal(Number((totalWithSurcharge - totalWithoutSurcharge).toFixed(2)), 0.19);
 });

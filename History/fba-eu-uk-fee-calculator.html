@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Amazon EU & UK FBA Fee Calculator</title>
   <script src="./fba-fee-data.js"></script>
-  <script src="./fba-surcharge-rules.js"></script>
+  <script src="./fba-surcharge-rules.js?v=20261117"></script>
   <script src="./profit-estimator.js?v=20261030profit"></script>
   <script src="./fba-history.js"></script>
   <style>
@@ -780,7 +780,7 @@
                 <input id="fuel-logistics-surcharge" name="fuelLogisticsSurcharge" type="checkbox" checked />
                 <div>
                   <strong>Fuel & logistics surcharge</strong>
-                  <span>默认按 2026-04-17 起的临时规则预估。UK / FR / DE / IT / ES / PL / SE / NL / IE / BE 会对基础 fulfilment fee 加收 1.5%。</span>
+                  <span>默认按 2026-11-02 起的规则预估。UK / FR / DE / IT / ES / PL / SE / NL / IE / BE 会对基础 fulfilment fee 加收 2%（此前为 1.5%）。</span>
                 </div>
               </label>
 
@@ -1075,6 +1075,7 @@
     }
 
     function formatEffectiveDate(dateString) {
+      if (dateString === "2026-11-02") return "November 2, 2026";
       if (dateString === "2026-04-17") return "April 17, 2026";
       return dateString;
     }
@@ -1086,7 +1087,7 @@
       return {
         applicable: false,
         rate: 0,
-        effectiveDate: "2026-04-17",
+        effectiveDate: "2026-11-02",
         scopeLabel: destination
       };
     }

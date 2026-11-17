@@ -9,8 +9,8 @@
   "eu-uk": {
     "name": "Amazon EU & UK",
     "route": "/eu-uk/",
-    "updatedAt": "2026-07-15",
-    "status": "Festive season peak toggle available for published EU/UK routes.",
+    "updatedAt": "2026-11-17",
+    "status": "Fuel & logistics surcharge: 2% effective November 2, 2026; festive season peak toggle available.",
     "coverage": "UK / FR / DE / IT / ES / PL / SE / NL / IE / BE"
   },
   "walmart": {
@@ -21,6 +21,12 @@
     "coverage": "Walmart US"
   },
   "homepageUpdates": [
+    {
+      "date": "2026-11-17",
+      "module": "eu-uk",
+      "title": "EU/UK fuel and logistics surcharge updated to 2%",
+      "summary": "The ten supported EU/UK destinations now use a 2% surcharge on base fulfilment fees, effective November 2, 2026 (previously 1.5%)."
+    },
     {
       "date": "2026-11-09",
       "module": "na",
@@ -65,6 +71,12 @@
     }
   ],
   "updates": [
+    {
+      "date": "2026-11-17",
+      "module": "eu-uk",
+      "title": "EU/UK fuel and logistics surcharge updated to 2%",
+      "summary": "The ten supported EU/UK destinations now use a 2% surcharge on base fulfilment fees, effective November 2, 2026 (previously 1.5%)."
+    },
     {
       "date": "2026-11-09",
       "module": "na",
